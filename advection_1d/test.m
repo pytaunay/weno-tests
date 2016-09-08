@@ -7,16 +7,12 @@
 
 clear all
 
-% Define our flux function
-% syms q flux_func(q)
-% flux_func(q) = q;
-
 xmin = -1;
 xmax = 1;
-ncell = 200;
+ncell = 400;
 
 tmin = 0;
-tmax = 20;
+tmax = 200;
 
 dx = abs(xmax-xmin)/ncell;
 xcell = -1+dx/2:dx:1-dx/2;

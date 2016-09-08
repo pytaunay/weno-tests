@@ -12,7 +12,7 @@ xmax = 1;
 ncell = 80;
 
 tmin = 0;
-tmax = 1.1;
+tmax = 0.5;
 
 dx = abs(xmax-xmin)/ncell;
 xcell = -1+dx/2:dx:1-dx/2;

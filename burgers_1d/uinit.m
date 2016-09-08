@@ -4,9 +4,9 @@
 function u0 = uinit( xcell )
   
 
-u0 = 0.25 + 0.5*sin(pi*xcell);
+%u0 = 0.25 + 0.5*sin(pi*xcell);
 
-%u0 = (xcell>=0) .* (xcell <= 0.5);
+u0 = (xcell>=0) .* (xcell <= 0.5);
 
 end
 
