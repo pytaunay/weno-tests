@@ -14,8 +14,7 @@ q3r = circshift(q(:,3),-1);
 if(~pbc)
    rhor(end,1) = q0(end,1);   
    q2r(end,1) = q0(end,2);    
-   q3r(end,1) = q0(end,3); 
-    
+   q3r(end,1) = q0(end,3);     
 end
 
 ul = q2l./rhol;
@@ -49,8 +48,7 @@ q3r = q(:,3);
 if(~pbc)
    rhol(1,1) = q0(1,1);   
    q2l(1,1) = q0(1,2);    
-   q3l(1,1) = q0(1,3); 
-    
+   q3l(1,1) = q0(1,3);     
 end
 
 ul = q2l./rhol;
@@ -68,7 +66,7 @@ uave = (sl.*ul + sr.*ur)./(sl + sr);
 e0ave = (sl.*e0l + sr.*e0r)./(sl+sr);
 
 % Output at i-1/2
-qaven = [rhoave,uave.*rhoave,e0ave.*rhoave];
+qaven = [rhoave,uave,e0ave];
 
 
 end

@@ -1,8 +1,13 @@
+%%% 09/2016 P-Y Taunay
+%%% FUnction eigMat calculates the eigenvalues and eigenvectors of the 
+%%% Jacobian matrix of the system based on the Roe decomposition
+
 function [D,R,Rinv] = eigMat( q, a, GAM )
 
+% No scaling necessary since we are based on the Roe decomposition
 rho = q(:,1); % rho
-u = q(:,2)./rho; % u
-e0 = q(:,3)./rho; % e
+u = q(:,2); % u
+e0 = q(:,3); % e
 
 D = cell(size(q,1),1);
 R = cell(size(q,1),1);

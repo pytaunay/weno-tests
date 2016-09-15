@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     15299,        493]
-NotebookOptionsPosition[     14495,        461]
-NotebookOutlinePosition[     14830,        476]
-CellTagsIndexPosition[     14787,        473]
+NotebookDataLength[     17759,        578]
+NotebookOptionsPosition[     16840,        542]
+NotebookOutlinePosition[     17175,        557]
+CellTagsIndexPosition[     17132,        554]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -454,6 +454,87 @@ Cell[BoxData[
  CellChangeTimes->{{3.682350594213032*^9, 3.682350612722274*^9}}]
 }, Open  ]],
 
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"FullSimplify", "[", 
+  RowBox[{"Inverse", "[", "matEigVecRescale", "]"}], "]"}]], "Input",
+ CellChangeTimes->{{3.682351623260119*^9, 3.682351640343749*^9}}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{
+     FractionBox[
+      RowBox[{"u", " ", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"2", " ", "a"}], "+", 
+         RowBox[{"u", " ", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"-", "1"}], "+", "\[Gamma]"}], ")"}]}]}], ")"}]}], 
+      RowBox[{"4", " ", 
+       SuperscriptBox["a", "2"]}]], ",", 
+     FractionBox[
+      RowBox[{
+       RowBox[{"2", " ", 
+        SuperscriptBox["a", "2"]}], "+", 
+       SuperscriptBox["u", "2"], "-", 
+       RowBox[{
+        SuperscriptBox["u", "2"], " ", "\[Gamma]"}]}], 
+      RowBox[{"2", " ", 
+       SuperscriptBox["a", "2"]}]], ",", 
+     RowBox[{"-", 
+      FractionBox[
+       RowBox[{"u", " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"2", " ", "a"}], "+", "u", "-", 
+          RowBox[{"u", " ", "\[Gamma]"}]}], ")"}]}], 
+       RowBox[{"4", " ", 
+        SuperscriptBox["a", "2"]}]]}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"-", 
+      FractionBox[
+       RowBox[{"a", "+", 
+        RowBox[{"u", " ", 
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{"-", "1"}], "+", "\[Gamma]"}], ")"}]}]}], 
+       RowBox[{"2", " ", 
+        SuperscriptBox["a", "2"]}]]}], ",", 
+     FractionBox[
+      RowBox[{"u", " ", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"-", "1"}], "+", "\[Gamma]"}], ")"}]}], 
+      SuperscriptBox["a", "2"]], ",", 
+     FractionBox[
+      RowBox[{"a", "+", "u", "-", 
+       RowBox[{"u", " ", "\[Gamma]"}]}], 
+      RowBox[{"2", " ", 
+       SuperscriptBox["a", "2"]}]]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     FractionBox[
+      RowBox[{
+       RowBox[{"-", "1"}], "+", "\[Gamma]"}], 
+      RowBox[{"2", " ", 
+       SuperscriptBox["a", "2"]}]], ",", 
+     FractionBox[
+      RowBox[{"1", "-", "\[Gamma]"}], 
+      SuperscriptBox["a", "2"]], ",", 
+     FractionBox[
+      RowBox[{
+       RowBox[{"-", "1"}], "+", "\[Gamma]"}], 
+      RowBox[{"2", " ", 
+       SuperscriptBox["a", "2"]}]]}], "}"}]}], "}"}]], "Output",
+ CellChangeTimes->{{3.682351628352311*^9, 3.6823516408115253`*^9}}]
+}, Open  ]],
+
 Cell[BoxData[""], "Input",
  CellChangeTimes->{{3.682348677654895*^9, 3.6823487389180326`*^9}, {
   3.682348857936764*^9, 3.682348874515329*^9}, {3.682348973208902*^9, 
@@ -479,7 +560,7 @@ Cell[558, 20, 1332, 38, 121, "Input"],
 Cell[1893, 60, 381, 9, 55, "Input"],
 Cell[CellGroupData[{
 Cell[2299, 73, 1035, 25, 77, "Input"],
-Cell[3337, 100, 1205, 39, 49, "Output"]
+Cell[3337, 100, 1205, 39, 106, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
 Cell[4579, 144, 735, 21, 55, "Input"],
@@ -494,7 +575,11 @@ Cell[CellGroupData[{
 Cell[11437, 363, 1907, 56, 131, "Input"],
 Cell[13347, 421, 937, 32, 54, "Output"]
 }, Open  ]],
-Cell[14299, 456, 192, 3, 32, "Input"]
+Cell[CellGroupData[{
+Cell[14321, 458, 180, 3, 32, "Input"],
+Cell[14504, 463, 2125, 71, 54, "Output"]
+}, Open  ]],
+Cell[16644, 537, 192, 3, 32, "Input"]
 }
 ]
 *)
