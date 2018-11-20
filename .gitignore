@@ -1,2 +1,4 @@
 Burgers
 *.m~
+*.pyc
+__pycache__
