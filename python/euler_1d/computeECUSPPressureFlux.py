@@ -9,8 +9,24 @@ Date: November 2018
 
 """
 
+import numpy as np
 
-def flux_pressure(UL,UR):
+
+"""
+Description: calculates P^+ and P^- (Eq. 22)
+P^+ is calculated on the left of the interface
+P^- is calculated on the right
+"""
+def compute_Ppm(MaL,MaR):
+    alpha = 3/16
+    Pp = 1/4 * (MaL+1)**2*(2-MaL) + alpha * MaL * (MaL**2-1)**2
+    
+    Pm = 1/4 * (MaR-1)**2*(2+MaR) - alpha * MaR * (MaR**2-1)**2
+
+    return Pp,Pm
+
+
+def flux_pressure(UL,UR,ah,MaL,MaR):
     # Get the pressure from primitive variables
     rhoL = UL[:,0]
     rhoR = UR[:,0]
@@ -24,4 +40,10 @@ def flux_pressure(UL,UR):
     PL = P_from_Ev(EL/rhoL,rhoL,vL)
     PR = P_from_Ev(ER/rhoR,rhoR,vR)
     
-    return 1
+    Pp, Pm = compute_Ppm(MaL,MaR)
+    
+    Fp = np.zeros(UL.shape)
+    Fp[:,1] = Pp * PL + Pm * PR
+    Fp[:,2] = 1/2 *( (PL*vL + ah) + (PR*vR-ah) )
+       
+    return Fp

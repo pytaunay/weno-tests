@@ -9,6 +9,10 @@ Date: November 2018
 
 """
 
+import numpy as np
+
+def compute_rhoh(rhoL,rhoR,uLp,uRp):
+    return rhoL * uLp + rhoR * uRp
 
 def compute_alphaL(UL,UR):
     rhoL = UL[:,0]
@@ -28,7 +32,7 @@ def compute_alphaL(UL,UR):
     
     return num/den
 
-def compute_alphaL(UL,UR):
+def compute_alphaR(UL,UR):
     rhoL = UL[:,0]
     rhoR = UR[:,0]
     
