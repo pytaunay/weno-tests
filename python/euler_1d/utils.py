@@ -5,7 +5,7 @@ Date: November 2018
 
 """
 
-GAM = 5/3
+GAM = 1.4
 
 # Useful functions
 def P_from_Ev(E,rho,v):
