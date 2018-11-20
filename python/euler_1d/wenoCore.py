@@ -7,7 +7,7 @@ Date: November 2018
 """
 import numpy as np
 
-EPS = 1e-16
+EPS = 1e-6
 
 
 ### WENO 3
@@ -40,11 +40,11 @@ def compute_weights(up1,u,um1,order):
     
         return w0,w1,wt0,wt1
     elif order == 5:
-        up2 = np.roll(up1,-1)
-        um2 = np.roll(um1,1)
+        up2 = np.roll(u,-2,axis=0)
+        um2 = np.roll(u,2,axis=0)
         
-        up2[-1,:] = 1e20 * np.ones((1,3))
-        um2[0,:] = 1e20 * np.ones((1,3))
+#        up2[-1,:] = 1e20 * np.ones((1,3))
+#        um2[0,:] = 1e20 * np.ones((1,3))
         
         d0 = 3/10
         d1 = 3/5
@@ -88,11 +88,11 @@ def compute_lr(up1,u,um1,order):
         uL = w0*u0p + w1*u1p
         uR = wt0*u0m + wt1*u1m
     elif order == 5:
-        up2 = np.roll(up1,-1)
-        um2 = np.roll(um1,1)
+        up2 = np.roll(u,-2,axis=0)
+        um2 = np.roll(u,2,axis=0)
         
-        up2[-1,:] = 1e20 * np.ones((1,3))
-        um2[0,:] = 1e20 * np.ones((1,3))
+#        up2[-1,:] = 1e20 * np.ones((1,3))
+#        um2[0,:] = 1e20 * np.ones((1,3))
         
         u0m = 11/6*u - 7/6*up1 + 1/3*up2
         u1m = 1/3*um1 + 5/6*u - 1/6*up1
