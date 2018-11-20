@@ -12,7 +12,7 @@ Date: November 2018
 import numpy as np
 from utils import P_from_Ev
 
-
+GAM = 1.4
 """
 Description: calculates P^+ and P^- (Eq. 22)
 P^+ is calculated on the left of the interface
@@ -28,15 +28,43 @@ def compute_Ppm(MaL,MaR):
 
 
 def flux_pressure(UL,UR,ah,MaL,MaR):
+#    rhoL = UL[:,0]
+#    rhoR = UR[:,0]
+#    
+#    vL = UL[:,1]/rhoL
+#    vR = UR[:,1]/rhoR
+#    
+#    EL = UL[:,2]/rhoL
+#    ER = UR[:,2]/rhoR
+#    
+#    PL = P_from_Ev(EL,rhoL,vL)
+#    PR = P_from_Ev(ER,rhoR,vR)
+#    aL = np.sqrt(GAM*PL/rhoL)
+#    aR = np.sqrt(GAM*PR/rhoR)  
+#    
+#    MaLloc = vL/aL
+#    MaRloc = vR/aR
+#    
+#    qL = np.zeros(UL.shape)
+#    qR = np.zeros(UR.shape)
+#    
+#    qL[:,1] = PL * MaLloc
+#    qL[:,2] = PL * aL
+#    
+#    qR[:,1] = PR * MaRloc
+#    qR[:,2] = PR * aR
+#    
+#    return 1/2 * (qR-qL)
+    
     # Get the pressure from primitive variables
     rhoL = UL[:,0]
     rhoR = UR[:,0]
     
-    vL = UL[:,1]/UL[:,0]
-    vR = UR[:,1]/UR[:,0]
+    vL = UL[:,1]/rhoL
+    vR = UR[:,1]/rhoR
     
-    EL = UL[:,2] / UL[:,0]
-    ER = UR[:,2] / UR[:,0]
+    EL = UL[:,2] / rhoL
+    ER = UR[:,2] / rhoR
 
     PL = P_from_Ev(EL,rhoL,vL)
     PR = P_from_Ev(ER,rhoR,vR)

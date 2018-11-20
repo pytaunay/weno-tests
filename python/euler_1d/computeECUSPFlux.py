@@ -43,56 +43,71 @@ def compute_ecusp_flux(u,U0,dz,order):
                 
     # Compute the RHS flux
     um1hL = np.roll(up1hL,1,axis=0) # This will contain u_{i-1/2}^L
-
        
     ### i + 1/2
     # Calculate the convective flux
-    vL = up1hL[:,1]/up1hL[:,0]
-    vR = up1hR[:,1]/up1hR[:,0]
+    rhoL = up1hL[:,0]
+    rhoR = up1hR[:,0]
+
     
-    PL = P_from_Ev(up1hL[:,2]/up1hL[:,0],up1hL[:,0],vL)
-    PR = P_from_Ev(up1hR[:,2]/up1hR[:,0],up1hR[:,0],vR)
+    vL = up1hL[:,1]/rhoL
+    vR = up1hR[:,1]/rhoR
     
-    ap1hL = np.sqrt(GAM*PL/up1hL[:,0])
-    ap1hR = np.sqrt(GAM*PR/up1hR[:,0])
+    EL = up1hL[:,2]/rhoL
+    ER = up1hR[:,2]/rhoR
+    
+    PL = P_from_Ev(EL,rhoL,vL)
+    PR = P_from_Ev(ER,rhoR,vR)
+    
+    ap1hL = np.sqrt(GAM*PL/rhoL)
+    ap1hR = np.sqrt(GAM*PR/rhoR)
     
     ah = 1/2*(ap1hL+ap1hR)
-    
-#    MaL = vL / ap1hL
-#    MaR = vR / ap1hR
  
     MaL = vL/ah
     MaR = vR/ah
+
     
-    fp1hc = flux_convective(up1hL,up1hR,ah,MaL,MaR)
+#    fRsub = 1/2*(compute_euler_flux(up1hL) + compute_euler_flux(up1hR)) 
+    fRsub = 0
+#    fp1hc = 0
+    fp1hc = flux_convective(up1hL,up1hR,ah,MaL,MaR)    
     fp1hp = flux_pressure(up1hL,up1hR,ah,MaL,MaR)
 #    fp1hp = 0
     
     ### i - 1/2
-    vL = um1hL[:,1]/um1hL[:,0]
-    vR = um1hR[:,1]/um1hR[:,0]
+    rhoL = um1hL[:,0]
+    rhoR = um1hR[:,0]
     
-    PL = P_from_Ev(um1hL[:,-1]/um1hL[:,0],um1hL[:,0],vL)
-    PR = P_from_Ev(um1hR[:,-1]/um1hR[:,0],um1hR[:,0],vR)
-    am1hL = np.sqrt(GAM*PL/um1hL[:,0])
-    am1hR = np.sqrt(GAM*PR/um1hR[:,0])
+    vL = um1hL[:,1]/rhoL
+    vR = um1hR[:,1]/rhoR
+    
+    EL = um1hL[:,2]/rhoL
+    ER = um1hR[:,2]/rhoR
+    
+    PL = P_from_Ev(EL,rhoL,vL)
+    PR = P_from_Ev(ER,rhoR,vR)
+    am1hL = np.sqrt(GAM*PL/rhoL)
+    am1hR = np.sqrt(GAM*PR/rhoR)
     
     ah = 1/2*(am1hL+am1hR)
-    
-#    MaL = vL / am1hL
-#    MaR = vR / am1hR
+
     MaL = vL/ah
     MaR = vR/ah
     
+#    fLsub = 1/2*(compute_euler_flux(um1hL) + compute_euler_flux(um1hR))
+    fLsub = 0
     fm1hc = flux_convective(um1hL,um1hR,ah,MaL,MaR)
+#    fm1hc = 0
     fm1hp = flux_pressure(um1hL,um1hR,ah,MaL,MaR)
 #    fm1hp = 0
 
 
     ### Calculate all types of fluxes
     # Subsonic
-    fRsub = fp1hc + fp1hp
-    fLsub = fm1hc + fm1hp
+    fRsub += (fp1hc + fp1hp)
+    fLsub += (fm1hc + fm1hp)
+    
     
     # Supersonic traveling right
     fRsupr = compute_euler_flux(up1hL)
@@ -130,3 +145,4 @@ def compute_ecusp_flux(u,U0,dz,order):
 #    print(fR-fL)
 
     return -1/dz * (fR-fL)
+#    return -1/dz * (fRsub-fLsub)

@@ -12,6 +12,8 @@ Date: November 2018
 import numpy as np
 from utils import P_from_Ev
 
+GAM = 1.4
+
 #def compute_rhoh(rhoL,rhoR,uLp,uRm):
 #    return rhoL * uLp + rhoR * uRm
 
@@ -70,6 +72,26 @@ def compute_uRm(ah,MaR,UL,UR):
 def flux_convective(UL,UR,ah,MaL,MaR):
     rhoL = UL[:,0]
     rhoR = UR[:,0]
+#    
+#    vL = UL[:,1]/rhoL
+#    vR = UR[:,1]/rhoR
+#    
+##    EL = UL[:,2]/rhoL
+##    ER = UR[:,2]/rhoR
+#    
+##    PL = P_from_Ev(EL,rhoL,vL)
+##    PR = P_from_Ev(ER,rhoR,vR)
+##    aL = np.sqrt(GAM*PL/rhoL)
+##    aR = np.sqrt(GAM*PR/rhoR)
+#    
+#    qL = np.copy(UL)
+#    qR = np.copy(UR)
+#    
+#    for idx in np.arange(0,3,1):
+#        qL[:,idx] *= np.abs(vL)
+#        qR[:,idx] *= np.abs(vR)
+#    
+#    return 1/2*(qR-qL)
     
     # Compute uLplus, uRplus
     uLp = compute_uLp(ah,MaL,UL,UR)
@@ -79,12 +101,12 @@ def flux_convective(UL,UR,ah,MaL,MaR):
     rhouh = rhoL * uLp + rhoR * uRm
     
     # Calculate qL, qR
-    qL = UL
+    qL = np.copy(UL)
     qL[:,0] /= rhoL
     qL[:,1] /= rhoL
     qL[:,2] /= rhoL
     
-    qR = UR
+    qR = np.copy(UR)
     qR[:,0] /= rhoR
     qR[:,1] /= rhoR
     qR[:,2] /= rhoR
