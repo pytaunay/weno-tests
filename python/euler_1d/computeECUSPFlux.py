@@ -6,13 +6,15 @@ Date: November 2018
 """
 
 import numpy as np
-from utils import P_from_Ev, E_from_Pv
+from utils import P_from_Ev
 from wenoCore import compute_lr
+from computeECUSPConvectiveFlux import flux_convective
+from computeECUSPPressureFlux import flux_pressure
 
 def compute_ah(aL,aR):
     return 1/2*(aL+aR)
 
-def compute_flux(u):
+def compute_ecusp_flux(u,U0,dz,order):
     # u_{i+1}, u_{i-1}
     up1 = np.roll(u,-1,axis=0)
     um1 = np.roll(u,1,axis=0)  
@@ -21,55 +23,69 @@ def compute_flux(u):
     up1[-1,:] = U0[-1,:]
     um1[0,:] = U0[0,:]
     
+    
+    
     ### Reconstruct the data on the stencil
-    uL, uR = compute_lr(up1,u,um1)
-            
+    up1hL, um1hR = compute_lr(up1,u,um1,order)
+                
     # Compute the RHS flux
-    up1h = np.roll(uR,-1) # This will contain u_{i+1/2}^R
-    um1h = np.roll(uL,1) # This will contain u_{i-1/2}^L
+    up1hR = np.roll(um1hR,-1,axis=0) # This will contain u_{i+1/2}^R
+    um1hL = np.roll(up1hL,1,axis=0) # This will contain u_{i-1/2}^L
     
     # Don't forget the BC
-    up1h[-1,:] = U0[-1,:]
-    um1h[0,:] = U0[0,:] 
+    up1hR[-1,:] = U0[-1,:]
+    um1hL[0,:] = U0[0,:] 
+       
+    ### i + 1/2
+    # Calculate the convective flux
+    vL = up1hL[:,1]/up1hL[:,0]
+    vR = up1hR[:,1]/up1hR[:,0]
     
-    ### Necessary intermediate steps
-    rho = u[:,0]
-    v = u[:,1]/u[:,0]
-    E = u[:,2]/u[:,0]
-    P = P_from_Ev(E,rho,v)
+    PL = P_from_Ev(up1hL[:,-1]/up1hL[:,0],up1hL[:,0],vL)
+    PR = P_from_Ev(up1hR[:,-1]/up1hR[:,0],up1hR[:,0],vR)
     
-    # What's the local speed of sound and Mach number everywhere?
-    a = np.sqrt(P/rho)
-    aR = np.roll(a,-1)
-    aL = np.roll(a,1)
-    P0L = P_from_Ev(U0[0,-1]/U0[0,0],U0[0,0],U0[0,1]/U0[0,0])
-    P0R = P_from_Ev(U0[-1,-1]/U0[-1,0],U0[-1,0],U0[-1,1]/U0[-1,0])
+    ap1hL = np.sqrt(PL/up1hL[:,0])
+    ap1hR = np.sqrt(PR/up1hR[:,0])
     
-    aR[-1] = np.sqrt(/rho0) 
-    aL[0] = np.sqrt(P0/rho0)
+    ah = 1/2*(ap1hL+ap1hR)
     
-    ah = 1/2*(aR+aL)
+    MaL = vL / ap1hL
+    MaR = vR / ap1hR
     
-    Ma = v/a
-    MaR = np.roll(Ma,-1)
-    MaL = np.roll(Ma,1)
-    MaR[-1] = 0
-    MaL[0] = 0
+    fp1hc = flux_convective(up1hL,up1hR,ah,MaL,MaR)
     
+    # Calculate the pressure flux
+    fp1hp = flux_pressure(up1hL,up1hR,ah,MaL,MaR)
     
+    ### i - 1/2
+    vL = um1hL[:,1]/um1hL[:,0]
+    vR = um1hR[:,1]/um1hR[:,0]
     
+    PL = P_from_Ev(um1hL[:,-1]/um1hL[:,0],um1hL[:,0],vL)
+    PR = P_from_Ev(um1hR[:,-1]/um1hR[:,0],um1hR[:,0],vR)
+    ap1hL = np.sqrt(PL/um1hL[:,0])
+    ap1hR = np.sqrt(PR/um1hR[:,0])
     
-    fpR = 0
-    fpL = 0
+    ah = 1/2*(ap1hL+ap1hR)
     
-#    if flux_type == 'LF':
-#        fpR = compute_flux_lf(uL,up1h)    
-#        fpL = compute_flux_lf(um1h,uR)  
-#    elif flux_type == 'ECUSP':
-#        fpR = compute_flux_ecusp(uL,up1h)
-#        fpL = compute_flux_ecusp(um1h,uR)
+    MaL = vL / ap1hL
+    MaR = vR / ap1hR
+    
+    fm1hc = flux_convective(um1hL,um1hR,ah,MaL,MaR)
+    fm1hp = flux_pressure(um1hL,um1hR,ah,MaL,MaR)
 
-    return -1/dz * (fpR-fpL)
 
-def compute_flux_ecusp():
-    return 1
+    ### Sum the two
+    fR = fp1hc + fp1hp
+    fL = fm1hc + fm1hp
+    # Add bool condition here  
+    
+    ### Make sure we use the applicable formula, which depends on the local speed
+
+    # Supersonic traveling right
+    
+    # Supersonic traveling left
+    
+
+
+    return -1/dz * (fR-fL)

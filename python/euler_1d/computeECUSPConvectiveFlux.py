@@ -10,6 +10,7 @@ Date: November 2018
 """
 
 import numpy as np
+from utils import P_from_Ev
 
 def compute_rhoh(rhoL,rhoR,uLp,uRp):
     return rhoL * uLp + rhoR * uRp
@@ -80,12 +81,19 @@ def flux_convective(UL,UR,ah,MaL,MaR):
     # Calculate qL, qR
     qL = UL
     qL[:,0] /= UL[:,0]
-    qL[:,1] /= UL[:,1]
-    qL[:,2] /= UL[:,2]
+    qL[:,1] /= UL[:,0]
+    qL[:,2] /= UL[:,0]
     
     qR = UR
     qR[:,0] /= UR[:,0]
-    qR[:,1] /= UR[:,1]
-    qR[:,2] /= UR[:,2]
+    qR[:,1] /= UR[:,0]
+    qR[:,2] /= UR[:,0]
     
-    return 1/2 * (rhoh*(qR+qL) - np.abs(rhoh)*(qR-qL))
+    qsum = qR + qL
+    qdif = qR - qL
+    
+    for idx in np.arange(0,3,1):
+        qsum[:,idx] *= rhoh
+        qdif[:,idx] *= np.abs(rhoh)
+    
+    return 1/2 * (qsum - qdif)
