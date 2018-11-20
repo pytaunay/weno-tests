@@ -10,20 +10,16 @@ import matplotlib.pyplot as plt
 
 from utils import P_from_Ev, rhoE_from_Pv
 from computeECUSPFlux import compute_ecusp_flux
+from computeLFFlux import compute_lf_flux
 
 ###############
 #### SETUP ####
 ###############
 # Grid
-npt = 100
+npt = 200
 L = 1
 dz = L/npt
 zvec = np.linspace(dz/2,L-dz/2,npt)
-
-# Time
-dt = dz / 1 * 0.4
-tmax = 2*dt
-tc = 0
 
 #Fluid
 GAM = 5/3
@@ -31,7 +27,7 @@ GAM = 5/3
 # Scheme
 # Flux can be 'LF', 'LW', 'FORCE' ,'FLIC', ECUSP
 order = 3
-flux_type = 'ECUSP'
+flux_type = 'LF'
 
 # Data holders
 # [rho,rho*u,E]
@@ -53,6 +49,16 @@ def f_0(U):
 f_0(U)
 U0 = U
 
+# Time
+P0 = P_from_Ev(U[:,2]/U[:,0],U[:,0],U[:,1]/U[:,0])
+a0 = np.sqrt(GAM * P0 / U[:,0])
+v0 = U[:,1]/U[:,0]
+lam = np.max(v0+a0)
+dt = dz /lam * 0.55
+tmax = 0.10
+tc = 0
+
+
 #######################
 #### TIME MARCHING ####
 #######################
@@ -60,29 +66,9 @@ idx = 0
 
 if flux_type == 'ECUSP':
     compute_flux = lambda U,U0,dz,order: compute_ecusp_flux(U,U0,dz,order)
+elif flux_type == 'LF':
+    compute_flux = lambda U,U0,dz,order: compute_lf_flux(U,U0,dz,order)
 
-#def compute_flux_lf(uL,uR):
-#    ### Left, right
-#    fL = flux(uL)
-#    fR = flux(uR)
-#    
-#    alpha = 1 # Derivative of flux
-#    
-#    return 1/2*(fL+fR-alpha*(uR-uL))    
-#
-#def compute_flux_lw(uL,uR):
-#    alpha = 1
-#    u_lw = 1/2 * (uL+uR) - 1/2*alpha*(flux(uR)-flux(uL))
-#    
-#    return flux(u_lw)
-#
-#def compute_flux_force(uL,uR):
-#    f_lf = compute_flux_lf(uL,uR)
-#    f_lw = compute_flux_lw(uL,uR)
-#    
-#    return 1/2*(f_lf + f_lw)
-    
-#
 while tc<tmax:
     UN = U  
 #    UNP1 = UN + dt * compute_flux(UN,U0,dz,order)
@@ -94,8 +80,27 @@ while tc<tmax:
     
     tc = tc+dt
 
-plt.plot(U,'o')
-plt.plot(U0,'k')
+plt.plot(zvec,U[:,0],'o')
+plt.plot(zvec,U0[:,0],'k')
 
-#plt.plot(zvec,u0,'-')
-#plt.plot(zvec,uvec,'o')
+############## TRY WITH ECUSP
+UN = U0
+tc = 0
+flux_type = 'ECUSP'
+idx = 0
+
+if flux_type == 'ECUSP':
+    compute_flux = lambda U,U0,dz,order: compute_ecusp_flux(U,U0,dz,order)
+elif flux_type == 'LF':
+    compute_flux = lambda U,U0,dz,order: compute_lf_flux(U,U0,dz,order)
+
+while tc<tmax:
+    UN = U  
+#    UNP1 = UN + dt * compute_flux(UN,U0,dz,order)
+    U1 = UN + dt * compute_flux(UN,U0,dz,order)   
+    U2 = 3/4*UN + 1/4*U1 + 1/4* dt * compute_flux(U1,U0,dz,order) 
+    UNP1 = 1/3*UN + 2/3*U2 + 2/3 * dt * compute_flux(U2,U0,dz,order)
+    
+    U = UNP1
+    
+    tc = tc+dt
