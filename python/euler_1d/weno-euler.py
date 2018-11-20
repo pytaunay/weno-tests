@@ -11,12 +11,13 @@ import matplotlib.pyplot as plt
 from utils import P_from_Ev, rhoE_from_Pv
 from computeECUSPFlux import compute_ecusp_flux
 from computeLFFlux import compute_lf_flux
+from defineCase import defineCase
 
 ###############
 #### SETUP ####
 ###############
 # Grid
-npt = 200
+npt = 400
 L = 1
 dz = L/npt
 zvec = np.linspace(dz/2,L-dz/2,npt)
@@ -26,31 +27,33 @@ GAM = 1.4
 
 # Scheme
 # Flux can be 'LF', 'LW', 'FORCE' ,'FLIC', ECUSP
-order = 5
+order = 3
 flux_type = 'LF'
 
 # Data holders
 # [rho,rho*u,E]
 U = np.zeros([len(zvec),3])
 
+caseNum = 1
 
+left, right, cfl, tmax = defineCase(caseNum)
 
 
 # Initial conditions
 def f_0(U):
     b = (zvec < 0.5)
-    U[:,0][b] = 1
-    U[:,1][b] = 0
-    U[:,2][b] = rhoE_from_Pv(1,U[:,0][b],U[:,1][b]/U[:,0][b])
+    U[:,0][b] = left[0]
+    U[:,1][b] = left[1] * left[0]
+    U[:,2][b] = rhoE_from_Pv(left[2],U[:,0][b],U[:,1][b]/U[:,0][b])
     
     b = (zvec>=0.5)
-    U[:,0][b] = 0.125
-    U[:,1][b] = 0
-    U[:,2][b] = rhoE_from_Pv(0.1,U[:,0][b],U[:,1][b]/U[:,0][b])
+    U[:,0][b] = right[0]
+    U[:,1][b] = right[1] * right[0]
+    U[:,2][b] = rhoE_from_Pv(right[2],U[:,0][b],U[:,1][b]/U[:,0][b])
     
     
 f_0(U)
-U0 = U
+U0 = np.copy(U)
 
 # Time
 P0 = P_from_Ev(U[:,2]/U[:,0],U[:,0],U[:,1]/U[:,0])
@@ -58,10 +61,7 @@ a0 = np.sqrt(GAM * P0 / U[:,0])
 v0 = U[:,1]/U[:,0]
 lam0 = np.max(v0+a0)
 
-cfl = 0.9
 dt = dz /lam0 * cfl
-tmax = 0.1
-#tmax = dt
 tc = 0
 
 
@@ -159,11 +159,15 @@ while tc<tmax:
 plt.plot(zvec,U[:,0],'x')
 
 # Exact solution
-rhoe = np.genfromtxt('rhoe.csv',delimiter=',')
-xe = np.genfromtxt('xe.csv',delimiter=',')
-plt.plot(xe,rhoe,'k-')
+caseStr = 'exact/' + str(caseNum) + '/case.csv'
+data = np.genfromtxt(caseStr, delimiter =',',names = True)
+plt.plot(data['xe'],data['rhoe'],'k-')
+
 
 # MATLAB solution
-#qmatlab = np.genfromtxt('qsod.csv',delimiter=',')
+#qmatlab = np.genfromtxt('q.csv',delimiter=',')
 #plt.plot(zvec,qmatlab[:,0],'^')
+
+
+
 
