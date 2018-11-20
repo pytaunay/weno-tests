@@ -16,7 +16,7 @@ from computeLFFlux import compute_lf_flux
 #### SETUP ####
 ###############
 # Grid
-npt = 100
+npt = 200
 L = 1
 dz = L/npt
 zvec = np.linspace(dz/2,L-dz/2,npt)
@@ -32,6 +32,9 @@ flux_type = 'LF'
 # Data holders
 # [rho,rho*u,E]
 U = np.zeros([len(zvec),3])
+
+
+
 
 # Initial conditions
 def f_0(U):
@@ -53,12 +56,12 @@ U0 = U
 P0 = P_from_Ev(U[:,2]/U[:,0],U[:,0],U[:,1]/U[:,0])
 a0 = np.sqrt(GAM * P0 / U[:,0])
 v0 = U[:,1]/U[:,0]
-lam = np.max(v0+a0)
+lam0 = np.max(v0+a0)
 
 cfl = 0.9
-dt = dz /lam * cfl
+dt = dz /lam0 * cfl
 tmax = 0.1
-#tmax = 0.1
+#tmax = dt
 tc = 0
 
 
@@ -73,7 +76,7 @@ elif flux_type == 'LF':
     compute_flux = lambda U,U0,dz,order: compute_lf_flux(U,U0,dz,order)
 
 while tc<tmax:
-    UN = U  
+    UN = np.copy(U)  
 
     U1 = UN + dt * compute_flux(UN,U0,dz,order)  
     U1[0,:] = U0[0,:]
@@ -87,7 +90,7 @@ while tc<tmax:
     UNP1[0,:] = U0[0,:]
     UNP1[-1,:] = U0[-1,:]   
        
-    U = UNP1
+    U = np.copy(UNP1)
 
     # Make sure we don't exceed the CFL condition by changing the time step
     rho = U[:,0]
@@ -108,9 +111,10 @@ plt.plot(zvec,U[:,0],'o')
 #plt.plot(zvec,U0[:,0],'k')
 
 ############### TRY WITH ECUSP
-UN = U0
+U = np.copy(U0)
 tc = 0
 flux_type = 'ECUSP'
+dt = dz /lam0 * cfl
 idx = 0
 
 if flux_type == 'ECUSP':
@@ -119,8 +123,9 @@ elif flux_type == 'LF':
     compute_flux = lambda U,U0,dz,order: compute_lf_flux(U,U0,dz,order)
 
 while tc<tmax:
-    UN = U  
+    UN = np.copy(U)  
 #    UNP1 = UN + dt * compute_flux(UN,U0,dz,order)
+#    
     U1 = UN + dt * compute_flux(UN,U0,dz,order)   
     U1[0,:] = U0[0,:]
     U1[-1,:] = U0[-1,:]
@@ -133,12 +138,12 @@ while tc<tmax:
     UNP1[0,:] = U0[0,:]
     UNP1[-1,:] = U0[-1,:] 
     
-    U = UNP1
+    U = np.copy(UNP1)
 
     # Make sure we don't exceed the CFL condition by changing the time step
     rho = U[:,0]
-    v = U[:,1] / U[:,0]
-    E = U[:,2] / U[:,0]
+    v = U[:,1] / rho
+    E = U[:,2] / rho
     P = P_from_Ev(E,rho,v)
     asos = np.sqrt(GAM * P / rho)
     lam = np.max(np.abs(v)+asos)
@@ -147,9 +152,6 @@ while tc<tmax:
     
     if(tc + dt > tmax):
         dt = tmax - tc
-    
-    tc = tc+dt
-
     
     tc = tc+dt
 
@@ -162,6 +164,6 @@ xe = np.genfromtxt('xe.csv',delimiter=',')
 plt.plot(xe,rhoe,'k-')
 
 # MATLAB solution
-qmatlab = np.genfromtxt('qsod.csv',delimiter=',')
-plt.plot(zvec,qmatlab[:,0],'^')
+#qmatlab = np.genfromtxt('qsod.csv',delimiter=',')
+#plt.plot(zvec,qmatlab[:,0],'^')
 
