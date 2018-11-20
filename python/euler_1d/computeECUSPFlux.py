@@ -11,6 +11,8 @@ from wenoCore import compute_lr
 from computeECUSPConvectiveFlux import flux_convective
 from computeECUSPPressureFlux import flux_pressure
 
+GAM = 5/3
+
 def compute_ah(aL,aR):
     return 1/2*(aL+aR)
 
@@ -44,8 +46,8 @@ def compute_ecusp_flux(u,U0,dz,order):
     PL = P_from_Ev(up1hL[:,-1]/up1hL[:,0],up1hL[:,0],vL)
     PR = P_from_Ev(up1hR[:,-1]/up1hR[:,0],up1hR[:,0],vR)
     
-    ap1hL = np.sqrt(PL/up1hL[:,0])
-    ap1hR = np.sqrt(PR/up1hR[:,0])
+    ap1hL = np.sqrt(GAM*PL/up1hL[:,0])
+    ap1hR = np.sqrt(GAM*PR/up1hR[:,0])
     
     ah = 1/2*(ap1hL+ap1hR)
     
@@ -63,8 +65,8 @@ def compute_ecusp_flux(u,U0,dz,order):
     
     PL = P_from_Ev(um1hL[:,-1]/um1hL[:,0],um1hL[:,0],vL)
     PR = P_from_Ev(um1hR[:,-1]/um1hR[:,0],um1hR[:,0],vR)
-    ap1hL = np.sqrt(PL/um1hL[:,0])
-    ap1hR = np.sqrt(PR/um1hR[:,0])
+    ap1hL = np.sqrt(GAM*PL/um1hL[:,0])
+    ap1hR = np.sqrt(GAM*PR/um1hR[:,0])
     
     ah = 1/2*(ap1hL+ap1hR)
     
