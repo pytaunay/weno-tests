@@ -9,7 +9,7 @@ import numpy as np
 from utils import P_from_Ev
 from wenoCore import compute_lr
 
-GAM = 5/3
+GAM = 1.4
 
 def compute_euler_flux(U):
     rho = U[:,0]
@@ -33,20 +33,21 @@ def compute_lf_flux(u,U0,dz,order):
     um1 = np.roll(u,1,axis=0)  
 
     # Don't forget the BC for this problem
-    up1[-1,:] = 1e20 * np.ones((1,3)) #U0[-1,:]
-    um1[0,:] = 1e20 * np.ones((1,3)) #U0[0,:]
+#    up1[-1,:] = U0[-1,:] #1e20 * np.ones((1,3)) #
+#    um1[0,:] = U0[0,:] #1e20 * np.ones((1,3)) #
          
     ### Reconstruct the data on the stencil
-    up1hL, um1hR = compute_lr(up1,u,um1,order)
+    up1hL, um1hR = compute_lr(up1,u,um1,order)  
+    up1hR = np.roll(um1hR,-1,axis=0)
                 
     # Compute the RHS flux
-    up1hR = np.roll(um1hR,-1,axis=0) # This will contain u_{i+1/2}^R
+#    up1hR = np.roll(um1hR,-1,axis=0) # This will contain u_{i+1/2}^R
     um1hL = np.roll(up1hL,1,axis=0) # This will contain u_{i-1/2}^L
     
    
     # Don't forget the BC
-    up1hR[-1,:] = U0[-1,:]
-    um1hL[0,:] = U0[0,:] 
+#    up1hR[-1,:] = U0[-1,:]
+#    um1hL[0,:] = U0[0,:] 
        
     ### i + 1/2   
     vL = up1hL[:,1]/up1hL[:,0]
