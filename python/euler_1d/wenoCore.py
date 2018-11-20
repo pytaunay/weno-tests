@@ -80,7 +80,7 @@ def compute_lr(up1,u,um1,order):
         u0m = 3/2*u - 1/2*up1
         u1m = 1/2*um1 + 1/2*u
         
-        w0,w1,wt0,wt1 = compute_weights(up1,u,um1)
+        w0,w1,wt0,wt1 = compute_weights(up1,u,um1,order)
         
         uL = w0*u0p + w1*u1p
         uR = wt0*u0m + wt1*u1m
@@ -96,7 +96,7 @@ def compute_lr(up1,u,um1,order):
         u1p = -1/6*um1 + 5/6*u + 1/3*up1
         u2p = 1/3*um2 -7/6*um1 + 11/6*u
         
-        w0,w1,w2,wt0,wt1,wt2 = compute_weights(up1,u,um1)
+        w0,w1,w2,wt0,wt1,wt2 = compute_weights(up1,u,um1,order)
         
         uL = w0*u0p + w1*u1p + w2*u2p
         uR = wt0*u0m + wt1*u1m + wt2*u2m
