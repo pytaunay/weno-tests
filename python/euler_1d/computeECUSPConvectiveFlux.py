@@ -12,21 +12,21 @@ Date: November 2018
 import numpy as np
 from utils import P_from_Ev
 
-def compute_rhoh(rhoL,rhoR,uLp,uRp):
-    return rhoL * uLp + rhoR * uRp
+#def compute_rhoh(rhoL,rhoR,uLp,uRm):
+#    return rhoL * uLp + rhoR * uRm
 
 def compute_alphaL(UL,UR):
     rhoL = UL[:,0]
     rhoR = UR[:,0]
     
-    vL = UL[:,1]
-    vR = UR[:,1]
+    vL = UL[:,1] / rhoL
+    vR = UR[:,1] / rhoR
     
-    EL = UL[:,2]
-    ER = UR[:,2]
+    EL = UL[:,2] / rhoL
+    ER = UR[:,2] / rhoR
 
-    PL = P_from_Ev(EL/rhoL,rhoL,vL)
-    PR = P_from_Ev(ER/rhoR,rhoR,vR)
+    PL = P_from_Ev(EL,rhoL,vL)
+    PR = P_from_Ev(ER,rhoR,vR)
     
     num = 2*(PL/rhoL)
     den = (PL/rhoL) + (PR/rhoR)
@@ -37,14 +37,14 @@ def compute_alphaR(UL,UR):
     rhoL = UL[:,0]
     rhoR = UR[:,0]
     
-    vL = UL[:,1]
-    vR = UR[:,1]
+    vL = UL[:,1] / rhoL
+    vR = UR[:,1] / rhoR
     
-    EL = UL[:,2]
-    ER = UR[:,2]
+    EL = UL[:,2] / rhoL
+    ER = UR[:,2] / rhoR
 
-    PL = P_from_Ev(EL/rhoL,rhoL,vL)
-    PR = P_from_Ev(ER/rhoR,rhoR,vR)
+    PL = P_from_Ev(EL,rhoL,vL)
+    PR = P_from_Ev(ER,rhoR,vR)
     
     num = 2*(PR/rhoR)
     den = (PL/rhoL) + (PR/rhoR)
@@ -59,7 +59,7 @@ def compute_uLp(ah,MaL,UL,UR):
     
     return ah*(t1+t2)
 
-def compute_uRp(ah,MaR,UL,UR):
+def compute_uRm(ah,MaR,UL,UR):
     aR = compute_alphaR(UL,UR)
     
     t1 = 1/2*(MaR - np.abs(MaR))
@@ -73,27 +73,27 @@ def flux_convective(UL,UR,ah,MaL,MaR):
     
     # Compute uLplus, uRplus
     uLp = compute_uLp(ah,MaL,UL,UR)
-    uRp = compute_uRp(ah,MaR,UL,UR)
+    uRm = compute_uRm(ah,MaR,UL,UR)
     
     # Calculate rho_u1h
-    rhoh = compute_rhoh(rhoL,rhoR,uLp,uRp)
+    rhouh = rhoL * uLp + rhoR * uRm
     
     # Calculate qL, qR
     qL = UL
-    qL[:,0] /= UL[:,0]
-    qL[:,1] /= UL[:,0]
-    qL[:,2] /= UL[:,0]
+    qL[:,0] /= rhoL
+    qL[:,1] /= rhoL
+    qL[:,2] /= rhoL
     
     qR = UR
-    qR[:,0] /= UR[:,0]
-    qR[:,1] /= UR[:,0]
-    qR[:,2] /= UR[:,0]
+    qR[:,0] /= rhoR
+    qR[:,1] /= rhoR
+    qR[:,2] /= rhoR
     
     qsum = qR + qL
     qdif = qR - qL
     
     for idx in np.arange(0,3,1):
-        qsum[:,idx] *= rhoh
-        qdif[:,idx] *= np.abs(rhoh)
+        qsum[:,idx] *= rhouh
+        qdif[:,idx] *= np.abs(rhouh)
     
     return 1/2 * (qsum - qdif)

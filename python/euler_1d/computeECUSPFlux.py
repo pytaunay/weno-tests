@@ -11,7 +11,23 @@ from wenoCore import compute_lr
 from computeECUSPConvectiveFlux import flux_convective
 from computeECUSPPressureFlux import flux_pressure
 
-GAM = 5/3
+GAM = 1.4
+
+def compute_euler_flux(U):
+    rho = U[:,0]
+    v = U[:,1] / rho
+    E = U[:,2] / rho
+    
+    P = P_from_Ev(E,rho,v)
+   
+    flx = np.zeros(U.shape)
+    
+    flx[:,0] = rho*v
+    flx[:,1] = rho*v**2 + P
+    flx[:,2] = rho*E*v + P*v
+    
+    return flx
+    
 
 def compute_ah(aL,aR):
     return 1/2*(aL+aR)
@@ -24,8 +40,6 @@ def compute_ecusp_flux(u,U0,dz,order):
     # Don't forget the BC for this problem
     up1[-1,:] = U0[-1,:]
     um1[0,:] = U0[0,:]
-    
-    
     
     ### Reconstruct the data on the stencil
     up1hL, um1hR = compute_lr(up1,u,um1,order)
@@ -43,21 +57,23 @@ def compute_ecusp_flux(u,U0,dz,order):
     vL = up1hL[:,1]/up1hL[:,0]
     vR = up1hR[:,1]/up1hR[:,0]
     
-    PL = P_from_Ev(up1hL[:,-1]/up1hL[:,0],up1hL[:,0],vL)
-    PR = P_from_Ev(up1hR[:,-1]/up1hR[:,0],up1hR[:,0],vR)
+    PL = P_from_Ev(up1hL[:,2]/up1hL[:,0],up1hL[:,0],vL)
+    PR = P_from_Ev(up1hR[:,2]/up1hR[:,0],up1hR[:,0],vR)
     
     ap1hL = np.sqrt(GAM*PL/up1hL[:,0])
     ap1hR = np.sqrt(GAM*PR/up1hR[:,0])
     
     ah = 1/2*(ap1hL+ap1hR)
     
-    MaL = vL / ap1hL
-    MaR = vR / ap1hR
+#    MaL = vL / ap1hL
+#    MaR = vR / ap1hR
+ 
+    MaL = vL/ah
+    MaR = vR/ah
     
     fp1hc = flux_convective(up1hL,up1hR,ah,MaL,MaR)
-    
-    # Calculate the pressure flux
     fp1hp = flux_pressure(up1hL,up1hR,ah,MaL,MaR)
+#    fp1hp = 0
     
     ### i - 1/2
     vL = um1hL[:,1]/um1hL[:,0]
@@ -65,29 +81,59 @@ def compute_ecusp_flux(u,U0,dz,order):
     
     PL = P_from_Ev(um1hL[:,-1]/um1hL[:,0],um1hL[:,0],vL)
     PR = P_from_Ev(um1hR[:,-1]/um1hR[:,0],um1hR[:,0],vR)
-    ap1hL = np.sqrt(GAM*PL/um1hL[:,0])
-    ap1hR = np.sqrt(GAM*PR/um1hR[:,0])
+    am1hL = np.sqrt(GAM*PL/um1hL[:,0])
+    am1hR = np.sqrt(GAM*PR/um1hR[:,0])
     
-    ah = 1/2*(ap1hL+ap1hR)
+    ah = 1/2*(am1hL+am1hR)
     
-    MaL = vL / ap1hL
-    MaR = vR / ap1hR
+#    MaL = vL / am1hL
+#    MaR = vR / am1hR
+    MaL = vL/ah
+    MaR = vR/ah
     
     fm1hc = flux_convective(um1hL,um1hR,ah,MaL,MaR)
     fm1hp = flux_pressure(um1hL,um1hR,ah,MaL,MaR)
+#    fm1hp = 0
 
 
-    ### Sum the two
-    fR = fp1hc + fp1hp
-    fL = fm1hc + fm1hp
-    # Add bool condition here  
+    ### Calculate all types of fluxes
+    # Subsonic
+    fRsub = fp1hc + fp1hp
+    fLsub = fm1hc + fm1hp
+    
+    # Supersonic traveling right
+    fRsupr = compute_euler_flux(up1hL)
+    fLsupr = compute_euler_flux(um1hL)
+    
+    # Supersonic travelight left
+    fRsupl = compute_euler_flux(up1hR)
+    fLsupl = compute_euler_flux(um1hR)    
+    
     
     ### Make sure we use the applicable formula, which depends on the local speed
-
-    # Supersonic traveling right
+    # What's the local speed of sound?
+    vloc = u[:,1]/u[:,0]
+    Eloc = u[:,2]/u[:,0]
+    rholoc = u[:,0]
     
-    # Supersonic traveling left
-    
+    Ploc = P_from_Ev(Eloc,rholoc,vloc)
+    aloc = np.sqrt(GAM*Ploc/rholoc)
 
+    b1 = (np.abs(vloc) < aloc)
+    b2 = vloc > aloc
+    b3 = vloc < -aloc
+    
+    fR = np.zeros(u.shape)
+    fL = np.zeros(u.shape)
+    
+    for idx in np.arange(0,3,1):
+        fR[:,idx] = fRsub[:,idx] * b1 + fRsupr[:,idx] * b2 + fRsupl[:,idx] * b3
+        fL[:,idx] = fLsub[:,idx] * b1 + fLsupr[:,idx] * b2 + fLsupl[:,idx] * b3
+
+#
+#    print(b1,b2,b3)
+#    print("------------")
+
+#    print(fR-fL)
 
     return -1/dz * (fR-fL)

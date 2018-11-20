@@ -32,19 +32,19 @@ def flux_pressure(UL,UR,ah,MaL,MaR):
     rhoL = UL[:,0]
     rhoR = UR[:,0]
     
-    vL = UL[:,1]
-    vR = UR[:,1]
+    vL = UL[:,1]/UL[:,0]
+    vR = UR[:,1]/UR[:,0]
     
-    EL = UL[:,2]
-    ER = UR[:,2]
+    EL = UL[:,2] / UL[:,0]
+    ER = UR[:,2] / UR[:,0]
 
-    PL = P_from_Ev(EL/rhoL,rhoL,vL)
-    PR = P_from_Ev(ER/rhoR,rhoR,vR)
+    PL = P_from_Ev(EL,rhoL,vL)
+    PR = P_from_Ev(ER,rhoR,vR)
     
     Pp, Pm = compute_Ppm(MaL,MaR)
     
     Fp = np.zeros(UL.shape)
     Fp[:,1] = Pp * PL + Pm * PR
-    Fp[:,2] = 1/2 *( (PL*vL + ah) + (PR*vR-ah) )
+    Fp[:,2] = 1/2 *( PL*(vL + ah) + PR*(vR-ah) )
        
     return Fp
