@@ -9,7 +9,7 @@ GAM = 5/3
 
 # Useful functions
 def P_from_Ev(E,rho,v):
-    return (GAM-1)*(E-1/2*v**2)
+    return (GAM-1)*(rho*E-1/2*rho*v**2)
     
-def E_from_Pv(P,rho,v):
-    return P/(GAM-1) + 1/2*v**2
+def rhoE_from_Pv(P,rho,v):
+    return P/(GAM-1) + 1/2*rho*v**2
