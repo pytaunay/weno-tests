@@ -112,6 +112,7 @@ WENO5LF
 % s5=subplot(2,3,5); plot(x,M,'or',xe,Me,'k'); xlabel('x(m)'); ylabel('Mach number');
 % s6=subplot(2,3,6); plot(x,e,'or',xe,ee,'k'); xlabel('x(m)'); ylabel('Internal Energy (kg/m^2s)');
 
+<<<<<<< HEAD
 % figure()
 subplot(2,2,1)
 plot(xe,rhoe,xcell,qpy(:,1),x,rho);    
@@ -129,6 +130,19 @@ title('Pressure')
 
 % figure
 subplot(2,2,4)
+figure
+plot(xe,rhoe,xcell,qpy(:,1),x,rho);    
+title('Density')
+
+figure
+plot(xe,ue,xcell,qpy(:,2)./qpy(:,1),x,u);
+title('Velocity')
+
+figure
+plot(xe,pe,xcell,pressure(qpy,GAM,'state'),x,p);
+title('Pressure')
+
+figure
 plot(xe,ee,xcell,qpy(:,3)./qpy(:,1)-1/2*(qpy(:,2)./qpy(:,1)).^2,x,e);
 title('Energy')
 

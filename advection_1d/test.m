@@ -12,7 +12,7 @@ xmax = 1;
 ncell = 400;
 
 tmin = 0;
-tmax = 2;
+tmax = 200;
 
 dx = abs(xmax-xmin)/ncell;
 xcell = -1+dx/2:dx:1-dx/2;
@@ -95,9 +95,9 @@ u = u0;
 t = 0;
 while t<=tmax
 
-     up1 = u + dt * bwlfl_lop(f1h,u,ncell,dt,dx);
-     
-     u = up1;
+    up1 = u + dt * bwlfl_lop(f1h,u,ncell,dt,dx);
+    u = up1;
+    t = t+dt;
     
 end
 
@@ -155,9 +155,9 @@ u = u0;
 t = 0;
 
 while t<=tmax
-   u1 = u + dt * weno3_fvm_lop(u,dx,dt,ncell,'LF',@flux_func,@dflux_func);
-   u2 = 3/4*u + 1/4*u1 + 1/4*dt*weno3_fvm_lop(u1,dx,dt,ncell,'LF',@flux_func,@dflux_func);
-   urk3 = 1/3*u+2/3*u2+2/3*dt*weno3_fvm_lop(u2,dx,dt,ncell,'LF',@flux_func,@dflux_func);
+   u1 = u + dt * weno3_fvm_lop(u,dx,dt,ncell,'FORCE',@flux_func,@dflux_func);
+   u2 = 3/4*u + 1/4*u1 + 1/4*dt*weno3_fvm_lop(u1,dx,dt,ncell,'FORCE',@flux_func,@dflux_func);
+   urk3 = 1/3*u+2/3*u2+2/3*dt*weno3_fvm_lop(u2,dx,dt,ncell,'FORCE',@flux_func,@dflux_func);
     
    u = urk3;
 
@@ -175,10 +175,9 @@ u = u0;
 t = 0;
 
 while t<=tmax
-
-   u1 = u + dt * weno5_fvm_lop(u,dx,dt,'LF','',@flux_func,@dflux_func);
-   u2 = 3/4*u + 1/4*u1 + 1/4*dt*weno5_fvm_lop(u1,dx,dt,'LF','',@flux_func,@dflux_func);
-   urk3 = 1/3*u+2/3*u2+2/3*dt*weno5_fvm_lop(u2,dx,dt,'LF','',@flux_func,@dflux_func);
+   u1 = u + dt * weno5_fvm_lop(u,dx,dt,'LW','',@flux_func,@dflux_func);
+   u2 = 3/4*u + 1/4*u1 + 1/4*dt*weno5_fvm_lop(u1,dx,dt,'LW','',@flux_func,@dflux_func);
+   urk3 = 1/3*u+2/3*u2+2/3*dt*weno5_fvm_lop(u2,dx,dt,'LW','',@flux_func,@dflux_func);
     
    u = urk3;
 
@@ -187,4 +186,4 @@ while t<=tmax
 end
 
 hold on
-plot(xcell,u0,xcell,urk3);
+plot(xcell,u0,xcell,urk3,'ro');

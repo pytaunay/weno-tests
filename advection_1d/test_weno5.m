@@ -8,7 +8,7 @@ xmax = 1;
 ncell = 200;
 
 tmin = 0;
-tmax = 2;
+tmax = 20;
 
 dx = abs(xmax-xmin)/ncell;
 xcell = -1+dx/2:dx:1-dx/2;
