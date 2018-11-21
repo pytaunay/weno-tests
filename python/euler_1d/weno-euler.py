@@ -40,7 +40,7 @@ GAM = 1.4
 
 # Scheme
 # Flux can be 'LF', 'LW', 'FORCE' ,'FLIC', ECUSP
-order = 3
+order = 5
 flux_type = 'LF'
 
 # Data holders
