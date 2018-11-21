@@ -68,12 +68,8 @@ def compute_ecusp_flux(u,U0,dz,order):
     MaR = vR/ah
 
     
-#    fRsub = 1/2*(compute_euler_flux(up1hL) + compute_euler_flux(up1hR)) 
-    fRsub = 0
-#    fp1hc = 0
     fp1hc = flux_convective(up1hL,up1hR,ah,MaL,MaR)    
     fp1hp = flux_pressure(up1hL,up1hR,ah,MaL,MaR)
-#    fp1hp = 0
     
     ### i - 1/2
     rhoL = um1hL[:,0]
@@ -95,18 +91,14 @@ def compute_ecusp_flux(u,U0,dz,order):
     MaL = vL/ah
     MaR = vR/ah
     
-#    fLsub = 1/2*(compute_euler_flux(um1hL) + compute_euler_flux(um1hR))
-    fLsub = 0
     fm1hc = flux_convective(um1hL,um1hR,ah,MaL,MaR)
-#    fm1hc = 0
     fm1hp = flux_pressure(um1hL,um1hR,ah,MaL,MaR)
-#    fm1hp = 0
 
 
     ### Calculate all types of fluxes
     # Subsonic
-    fRsub += (fp1hc + fp1hp)
-    fLsub += (fm1hc + fm1hp)
+    fRsub = (fp1hc + fp1hp)
+    fLsub = (fm1hc + fm1hp)
     
     
     # Supersonic traveling right
@@ -127,13 +119,13 @@ def compute_ecusp_flux(u,U0,dz,order):
     Ploc = P_from_Ev(Eloc,rholoc,vloc)
     aloc = np.sqrt(GAM*Ploc/rholoc)
 
-    b1 = (np.abs(vloc) < aloc)
+    b1 = (np.abs(vloc) <= aloc)
     b2 = vloc > aloc
     b3 = vloc < -aloc
     
     fR = np.zeros(u.shape)
     fL = np.zeros(u.shape)
-    
+        
     for idx in np.arange(0,3,1):
         fR[:,idx] = fRsub[:,idx] * b1 + fRsupr[:,idx] * b2 + fRsupl[:,idx] * b3
         fL[:,idx] = fLsub[:,idx] * b1 + fLsupr[:,idx] * b2 + fLsupl[:,idx] * b3

@@ -13,32 +13,6 @@ from computeECUSPFlux import compute_ecusp_flux
 from computeLFFlux import compute_lf_flux
 from defineCase import defineCase
 
-###############
-#### SETUP ####
-###############
-# Grid
-npt = 400
-L = 1
-dz = L/npt
-zvec = np.linspace(dz/2,L-dz/2,npt)
-
-#Fluid
-GAM = 1.4
-
-# Scheme
-# Flux can be 'LF', 'LW', 'FORCE' ,'FLIC', ECUSP
-order = 3
-flux_type = 'LF'
-
-# Data holders
-# [rho,rho*u,E]
-U = np.zeros([len(zvec),3])
-
-caseNum = 1
-
-left, right, cfl, tmax = defineCase(caseNum)
-
-
 # Initial conditions
 def f_0(U):
     b = (zvec < 0.5)
@@ -50,7 +24,33 @@ def f_0(U):
     U[:,0][b] = right[0]
     U[:,1][b] = right[1] * right[0]
     U[:,2][b] = rhoE_from_Pv(right[2],U[:,0][b],U[:,1][b]/U[:,0][b])
-    
+
+
+###############
+#### SETUP ####
+###############
+# Grid
+npt = 100
+L = 1
+dz = L/npt
+zvec = np.linspace(dz/2,L-dz/2,npt)
+
+#Fluid
+GAM = 1.4
+
+# Scheme
+# Flux can be 'LF', 'LW', 'FORCE' ,'FLIC', ECUSP
+order = 5
+flux_type = 'LF'
+
+# Data holders
+# [rho,rho*u,E]
+U = np.zeros([len(zvec),3])
+
+# Case definition
+caseNum = 8
+left, right, cfl, tmax = defineCase(caseNum)
+
     
 f_0(U)
 U0 = np.copy(U)
@@ -107,6 +107,7 @@ while tc<tmax:
     
     tc = tc+dt
 
+#plt.plot(zvec,U[:,1]/U[:,0]/asos,'o')
 plt.plot(zvec,U[:,0],'o')
 #plt.plot(zvec,U0[:,0],'k')
 
@@ -156,11 +157,13 @@ while tc<tmax:
     tc = tc+dt
 
 
+#plt.plot(zvec,U[:,1]/U[:,0]/asos,'x')
 plt.plot(zvec,U[:,0],'x')
 
 # Exact solution
 caseStr = 'exact/' + str(caseNum) + '/case.csv'
 data = np.genfromtxt(caseStr, delimiter =',',names = True)
+#plt.plot(data['xe'],data['Me'],'k-')
 plt.plot(data['xe'],data['rhoe'],'k-')
 
 
