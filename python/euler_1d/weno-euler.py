@@ -40,7 +40,7 @@ GAM = 1.4
 
 # Scheme
 # Flux can be 'LF', 'LW', 'FORCE' ,'FLIC', ECUSP
-order = 5
+order = 3
 flux_type = 'LF'
 
 # Data holders
@@ -48,10 +48,8 @@ flux_type = 'LF'
 U = np.zeros([len(zvec),3])
 
 # Case definition
-caseNum = 8
+caseNum = 7
 left, right, cfl, tmax = defineCase(caseNum)
-
-    
 f_0(U)
 U0 = np.copy(U)
 
@@ -64,6 +62,12 @@ lam0 = np.max(v0+a0)
 dt = dz /lam0 * cfl
 tc = 0
 
+# Plots
+f, axarr = plt.subplots(2, 2)
+axarr[0,0].set_title("Density")
+axarr[0,1].set_title("Pressure")
+axarr[1,0].set_title("Temperature")
+axarr[1,1].set_title("Velocity")
 
 #######################
 #### TIME MARCHING ####
@@ -107,9 +111,14 @@ while tc<tmax:
     
     tc = tc+dt
 
-#plt.plot(zvec,U[:,1]/U[:,0]/asos,'o')
-plt.plot(zvec,U[:,0],'o')
-#plt.plot(zvec,U0[:,0],'k')
+
+
+
+axarr[0,0].plot(zvec,U[:,0],'o')
+axarr[0,1].plot(zvec,P,'o')
+axarr[1,0].plot(zvec,P/U[:,0],'o')
+axarr[1,1].plot(zvec,U[:,1]/U[:,0],'o')
+
 
 ############### TRY WITH ECUSP
 U = np.copy(U0)
@@ -156,15 +165,22 @@ while tc<tmax:
     
     tc = tc+dt
 
-
-#plt.plot(zvec,U[:,1]/U[:,0]/asos,'x')
-plt.plot(zvec,U[:,0],'x')
+axarr[0,0].plot(zvec,U[:,0],'x')
+axarr[0,1].plot(zvec,P,'x')
+axarr[1,0].plot(zvec,P/U[:,0],'x')
+axarr[1,1].plot(zvec,U[:,1]/U[:,0],'x')
 
 # Exact solution
 caseStr = 'exact/' + str(caseNum) + '/case.csv'
 data = np.genfromtxt(caseStr, delimiter =',',names = True)
 #plt.plot(data['xe'],data['Me'],'k-')
-plt.plot(data['xe'],data['rhoe'],'k-')
+#plt.plot(data['xe'],data['rhoe'],'k-')
+
+axarr[0,0].plot(data['xe'],data['rhoe'],'k-')
+axarr[0,1].plot(data['xe'],data['pe'],'k-')
+axarr[1,0].plot(data['xe'],data['pe']/data['rhoe'],'k-')
+axarr[1,1].plot(data['xe'],data['ue'],'k-')
+
 
 
 # MATLAB solution
