@@ -63,11 +63,12 @@ dt = dz /lam0 * cfl
 tc = 0
 
 # Plots
-f, axarr = plt.subplots(2, 2)
+f, axarr = plt.subplots(3, 2)
 axarr[0,0].set_title("Density")
 axarr[0,1].set_title("Pressure")
 axarr[1,0].set_title("Temperature")
 axarr[1,1].set_title("Velocity")
+axarr[2,0].set_title("Mach number")
 
 #######################
 #### TIME MARCHING ####
@@ -118,7 +119,7 @@ axarr[0,0].plot(zvec,U[:,0],'o')
 axarr[0,1].plot(zvec,P,'o')
 axarr[1,0].plot(zvec,P/U[:,0],'o')
 axarr[1,1].plot(zvec,U[:,1]/U[:,0],'o')
-
+axarr[2,0].plot(zvec,U[:,1]/U[:,0]/asos,'o')
 
 ############### TRY WITH ECUSP
 U = np.copy(U0)
@@ -169,6 +170,7 @@ axarr[0,0].plot(zvec,U[:,0],'x')
 axarr[0,1].plot(zvec,P,'x')
 axarr[1,0].plot(zvec,P/U[:,0],'x')
 axarr[1,1].plot(zvec,U[:,1]/U[:,0],'x')
+axarr[2,0].plot(zvec,U[:,1]/U[:,0]/asos,'x')
 
 # Exact solution
 caseStr = 'exact/' + str(caseNum) + '/case.csv'
@@ -180,6 +182,7 @@ axarr[0,0].plot(data['xe'],data['rhoe'],'k-')
 axarr[0,1].plot(data['xe'],data['pe'],'k-')
 axarr[1,0].plot(data['xe'],data['pe']/data['rhoe'],'k-')
 axarr[1,1].plot(data['xe'],data['ue'],'k-')
+axarr[2,0].plot(data['xe'],data['Me'],'k-')
 
 
 
