@@ -64,13 +64,13 @@ def compute_eigenvector(U):
         
         Rjinv[1,0] = 1-1/2*(GAM-1)*voa**2
         Rjinv[1,1] = (GAM-1)*v[idx]/a2
-        Rjinv[1,2] = (GAM-1)/a2
+        Rjinv[1,2] = -(GAM-1)/a2
         
         Rjinv[2,0] = 1/2*(1/2*(GAM-1)*voa**2 - voa)
         Rjinv[2,1] = -1/(2*a[idx]) * ((GAM-1)*voa - 1)
         Rjinv[2,2] = (GAM-1)/(2*a2)
     
-    
+
         Rjlist.append(Rj)
         Rjinvlist.append(Rjinv)
         
