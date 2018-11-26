@@ -50,6 +50,7 @@ U = np.zeros([len(zvec),3])
 # Case definition
 caseNum = 7
 left, right, cfl, tmax = defineCase(caseNum)
+cfl = 0.25
 f_0(U)
 U0 = np.copy(U)
 
@@ -166,11 +167,11 @@ while tc<tmax:
     
     tc = tc+dt
 
-axarr[0,0].plot(zvec,U[:,0],'x')
-axarr[0,1].plot(zvec,P,'x')
-axarr[1,0].plot(zvec,P/U[:,0],'x')
-axarr[1,1].plot(zvec,U[:,1]/U[:,0],'x')
-axarr[2,0].plot(zvec,U[:,1]/U[:,0]/asos,'x')
+#axarr[0,0].plot(zvec,U[:,0],'x')
+#axarr[0,1].plot(zvec,P,'x')
+#axarr[1,0].plot(zvec,P/U[:,0],'x')
+#axarr[1,1].plot(zvec,U[:,1]/U[:,0],'x')
+#axarr[2,0].plot(zvec,U[:,1]/U[:,0]/asos,'x')
 
 # Exact solution
 caseStr = 'exact/' + str(caseNum) + '/case.csv'

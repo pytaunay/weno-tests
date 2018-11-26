@@ -120,14 +120,134 @@ def compute_lf_flux(u,U0,dz,order):
     up1 = np.roll(u,-1,axis=0)
     um1 = np.roll(u,1,axis=0)  
 
-    ### Roe average at u^{i+-1/2}
-    up1h, um1h = roe_average(u,U0)
+#    ### Roe average at u^{i+-1/2}
+#    up1h, um1h = roe_average(u,U0)
+#
+#    ### LF Flux splitting: f = f^+ + f^- where
+#    ### f^{+-} = 1/2*(F[U] + alpha * U)
+#    ### We do reconstruction on the FLUX
+#    
+#    ### Calculate the LF split flux in all cells
+#    rho = u[:,0]
+#    v = u[:,1]/rho
+#    E = u[:,2]/rho
+#     
+#    P = P_from_Ev(E,rho,v)
+#    
+#    a = np.sqrt(GAM*P/rho)
+#    
+#    # We want the max eigenvalue  
+#    l1 = np.abs(v-a)   
+#    l2 = np.abs(v)
+#    l3 = np.abs(v+a)
+#    
+#    eig = np.vstack((l1,l2,l3))
+#    eig = np.transpose(eig)
+#    alpha = np.max(eig) # GLOBAL MAX
+#
+#    ### Characteristics
+#    # Eigenvectors: Compute the block matrix at each right eigenvector
+#    Rjp1h,Rjinvp1h = compute_right_eigenvector(up1h);
+#    Rjm1h,Rjinvm1h = compute_right_eigenvector(um1h);
+#
+#    # Transform into the characteristic domain
+#    v = np.copy(u)
+#    g = np.copy(u) 
+#    
+#    flx = compute_euler_flux(u)
+#    
+#    ######
+#    # I + 1/2
+#    ######
+#    nelem = u.shape[0]
+#    for idx in np.arange(0,nelem,1):
+#        v[idx,:] = np.matmul(Rjinvp1h[idx],u[idx,:])
+#        g[idx,:] = np.matmul(Rjinvp1h[idx],flx[idx,:])
+#
+#    ### Reconstruct WENO in the characteristics domain
+#    FLXp = np.zeros(u.shape)
+#    FLXm = np.zeros(u.shape)
+#    for idx in np.arange(0,3,1):
+#        FLXp[:,idx] = 1/2*(g[:,idx] + alpha*v[:,idx])
+#        FLXm[:,idx] = 1/2*(g[:,idx] - alpha*v[:,idx])
+#    
+#    ### i + 1/2 ^+
+#    fp1 = np.roll(FLXp,-1,axis=0)
+#    fm1 = np.roll(FLXp,1,axis=0)
+#    
+#    # Reconstruct the data on the stencil
+#    fp1hL, fm1hR = compute_lr(fp1,FLXp,fm1,order)
+#    fp1hR = np.roll(fm1hR,-1,axis=0)
+#    #up1hL, um1hR = compute_lr(up1,u,um1,order)  
+#    #up1hR = np.roll(um1hR,-1,axis=0)
+#                
+#    # Compute the RHS flux
+#    fiph1_P = fp1hL
+#    
+#    ### i+1/2 ^-
+#    fp1 = np.roll(FLXm,-1,axis=0)
+#    fm1 = np.roll(FLXm,1,axis=0)
+#    
+#    # Reconstruct the data on the stencil
+#    fp1hL, fm1hR = compute_lr(fp1,FLXm,fm1,order)
+#    fp1hR = np.roll(fm1hR,-1,axis=0)
+#    fiph1_M = fp1hR
+#    
+#    ### Go back to component domain
+#    for idx in np.arange(0,nelem,1):
+#        fiph1_P[idx,:] = np.matmul(Rjp1h[idx],fiph1_P[idx,:])
+#        fiph1_M[idx,:] = np.matmul(Rjp1h[idx],fiph1_M[idx,:])
+#
+#    FLXp1h = fiph1_P + fiph1_M
+#    
+#    ######
+#    # I - 1/2
+#    ######
+#    nelem = u.shape[0]
+#    for idx in np.arange(0,nelem,1):
+#        v[idx,:] = np.matmul(Rjinvm1h[idx],u[idx,:])
+#        g[idx,:] = np.matmul(Rjinvm1h[idx],flx[idx,:])
+#
+#    ### Reconstruct WENO in the characteristics domain
+#    FLXp = np.zeros(u.shape)
+#    FLXm = np.zeros(u.shape)
+#    for idx in np.arange(0,3,1):
+#        FLXp[:,idx] = 1/2*(g[:,idx] + alpha*v[:,idx])
+#        FLXm[:,idx] = 1/2*(g[:,idx] - alpha*v[:,idx])
+#    
+#    ### i - 1/2 ^+
+#    fp1 = np.roll(FLXp,-1,axis=0)
+#    fm1 = np.roll(FLXp,1,axis=0)
+#    
+#    # Reconstruct the data on the stencil
+#    fp1hL, fm1hR = compute_lr(fp1,FLXp,fm1,order)
+#    fp1hR = np.roll(fm1hR,-1,axis=0)
+#    #up1hL, um1hR = compute_lr(up1,u,um1,order)  
+#    #up1hR = np.roll(um1hR,-1,axis=0)
+#                
+#    # Compute the RHS flux
+#    fiph1_M = fm1hR
+#    
+#    ### i-1/2 ^-
+#    fp1 = np.roll(FLXm,-1,axis=0)
+#    fm1 = np.roll(FLXm,1,axis=0)
+#    
+#    # Reconstruct the data on the stencil
+#    fp1hL, fm1hR = compute_lr(fp1,FLXm,fm1,order)
+##    fp1hR = np.roll(fm1hR,-1,axis=0)
+#    fm1hL = np.roll(fp1hL,1,axis=0)
+#    fiph1_P = fm1hL
+#    
+#    ### Go back to component domain
+#    for idx in np.arange(0,nelem,1):
+#        fiph1_P[idx,:] = np.matmul(Rjm1h[idx],fiph1_P[idx,:])
+#        fiph1_M[idx,:] = np.matmul(Rjm1h[idx],fiph1_M[idx,:])    
+#        
+#    FLXm1h = fiph1_P + fiph1_M
+#
+#    return -1/dz*(FLXp1h - FLXm1h)
 
-    ### LF Flux splitting: f = f^+ + f^- where
-    ### f^{+-} = 1/2*(F[U] + alpha * U)
-    ### We do reconstruction on the FLUX
-    
-    ### Calculate the LF split flux in all cells
+    ### Calculate the max eigenvalue of all cells
     rho = u[:,0]
     v = u[:,1]/rho
     E = u[:,2]/rho
@@ -145,163 +265,41 @@ def compute_lf_flux(u,U0,dz,order):
     eig = np.transpose(eig)
     alpha = np.max(eig) # GLOBAL MAX
 
-    ### Characteristics
-    # Eigenvectors: Compute the block matrix at each right eigenvector
-    Rjp1h,Rjinvp1h = compute_right_eigenvector(up1h);
-    Rjm1h,Rjinvm1h = compute_right_eigenvector(um1h);
-
-    # Transform into the characteristic domain
-    v = np.copy(u)
-    g = np.copy(u) 
+    ### LF Flux splitting: f = f^+ + f^- where
+    ### f^{+-} = 1/2*(F[U] + alpha * U)
+    ### We do reconstruction on the FLUX
+    ### f^+
+    # First calculate the flux
+    flx = 1/2* (compute_euler_flux(u) + alpha*u)
     
-    flx = compute_euler_flux(u)
+    # f_{i+1}, f_{i-1}
+    fp1 = np.roll(flx,-1,axis=0)
+    fm1 = np.roll(flx,1,axis=0)     
     
-    ######
-    # I + 1/2
-    ######
-    nelem = u.shape[0]
-    for idx in np.arange(0,nelem,1):
-        v[idx,:] = np.matmul(Rjinvp1h[idx],u[idx,:])
-        g[idx,:] = np.matmul(Rjinvp1h[idx],flx[idx,:])
-
-    ### Reconstruct WENO in the characteristics domain
-    FLXp = np.zeros(u.shape)
-    FLXm = np.zeros(u.shape)
-    for idx in np.arange(0,3,1):
-        FLXp[:,idx] = 1/2*(g[:,idx] + alpha*v[:,idx])
-        FLXm[:,idx] = 1/2*(g[:,idx] - alpha*v[:,idx])
-    
-    ### i + 1/2 ^+
-    fp1 = np.roll(FLXp,-1,axis=0)
-    fm1 = np.roll(FLXp,1,axis=0)
-    
-    # Reconstruct the data on the stencil
-    fp1hL, fm1hR = compute_lr(fp1,FLXp,fm1,order)
-    fp1hR = np.roll(fm1hR,-1,axis=0)
-    #up1hL, um1hR = compute_lr(up1,u,um1,order)  
-    #up1hR = np.roll(um1hR,-1,axis=0)
-                
-    # Compute the RHS flux
-    fiph1_P = fp1hL
-    
-    ### i+1/2 ^-
-    fp1 = np.roll(FLXm,-1,axis=0)
-    fm1 = np.roll(FLXm,1,axis=0)
-    
-    # Reconstruct the data on the stencil
-    fp1hL, fm1hR = compute_lr(fp1,FLXm,fm1,order)
-    fp1hR = np.roll(fm1hR,-1,axis=0)
-    fiph1_M = fp1hR
-    
-    ### Go back to component domain
-    for idx in np.arange(0,nelem,1):
-        fiph1_P[idx,:] = np.matmul(Rjp1h[idx],fiph1_P[idx,:])
-        fiph1_M[idx,:] = np.matmul(Rjp1h[idx],fiph1_M[idx,:])
-
-    FLXp1h = fiph1_P + fiph1_M
-    
-    ######
-    # I - 1/2
-    ######
-    nelem = u.shape[0]
-    for idx in np.arange(0,nelem,1):
-        v[idx,:] = np.matmul(Rjinvm1h[idx],u[idx,:])
-        g[idx,:] = np.matmul(Rjinvm1h[idx],flx[idx,:])
-
-    ### Reconstruct WENO in the characteristics domain
-    FLXp = np.zeros(u.shape)
-    FLXm = np.zeros(u.shape)
-    for idx in np.arange(0,3,1):
-        FLXp[:,idx] = 1/2*(g[:,idx] + alpha*v[:,idx])
-        FLXm[:,idx] = 1/2*(g[:,idx] - alpha*v[:,idx])
-    
-    ### i - 1/2 ^+
-    fp1 = np.roll(FLXp,-1,axis=0)
-    fm1 = np.roll(FLXp,1,axis=0)
-    
-    # Reconstruct the data on the stencil
-    fp1hL, fm1hR = compute_lr(fp1,FLXp,fm1,order)
-    fp1hR = np.roll(fm1hR,-1,axis=0)
-    #up1hL, um1hR = compute_lr(up1,u,um1,order)  
-    #up1hR = np.roll(um1hR,-1,axis=0)
-                
-    # Compute the RHS flux
-    fiph1_M = fm1hR
-    
-    ### i-1/2 ^-
-    fp1 = np.roll(FLXm,-1,axis=0)
-    fm1 = np.roll(FLXm,1,axis=0)
-    
-    # Reconstruct the data on the stencil
-    fp1hL, fm1hR = compute_lr(fp1,FLXm,fm1,order)
-#    fp1hR = np.roll(fm1hR,-1,axis=0)
+    # WENO Reconstruction
+    fp1hL, fm1hR = compute_lr(fp1,flx,fm1,order)
     fm1hL = np.roll(fp1hL,1,axis=0)
-    fiph1_P = fm1hL
     
-    ### Go back to component domain
-    for idx in np.arange(0,nelem,1):
-        fiph1_P[idx,:] = np.matmul(Rjm1h[idx],fiph1_P[idx,:])
-        fiph1_M[idx,:] = np.matmul(Rjm1h[idx],fiph1_M[idx,:])    
-        
-    FLXm1h = fiph1_P + fiph1_M
+    # Flux
+    fp1h = fp1hL
+    fm1h = fm1hL
+    
+    ### f^-
+    # First calculate the flux
+    flx = 1/2* (compute_euler_flux(u) - alpha*u)
+    
+    # f_{i+1}, f_{i-1}
+    fp1 = np.roll(flx,-1,axis=0)
+    fm1 = np.roll(flx,1,axis=0)     
+    
+    # WENO Reconstruction
+    fp1hL, fm1hR = compute_lr(fp1,flx,fm1,order)
+    fp1hR = np.roll(fm1hR,-1,axis=0)   
 
-    return -1/dz*(FLXp1h - FLXm1h)
-#    ### i + 1/2   
-#    vL = up1hL[:,1]/up1hL[:,0]
-#    vR = up1hR[:,1]/up1hR[:,0]
-#    
-#    PL = P_from_Ev(up1hL[:,-1]/up1hL[:,0],up1hL[:,0],vL)
-#    PR = P_from_Ev(up1hR[:,-1]/up1hR[:,0],up1hR[:,0],vR)
-#    
-#    ap1hL = np.sqrt(GAM*PL/up1hL[:,0])
-#    ap1hR = np.sqrt(GAM*PR/up1hR[:,0])
-#
-#    # We want the max eigenvalue of the Jacobian evaluated both at L and R     
-#    l1L = np.abs(vL-ap1hL)
-#    l1R = np.abs(vR-ap1hR)
-#    
-#    l2L = np.abs(vL)
-#    l2R = np.abs(vR)
-#
-#    l3L = np.abs(vL+ap1hL)
-#    l3R = np.abs(vR+ap1hR)
-#    
-#    eig = np.vstack((l1L,l1R,l2L,l2R,l3L,l3R))
-#    eig = np.transpose(eig)
-#    alpha = np.max(eig,axis=1)
-#    
-#    fR = compute_euler_flux(up1hL) + compute_euler_flux(up1hR)
-#    for idx in np.arange(0,3,1):
-#        fR[:,idx] -= alpha * (up1hR[:,idx]-up1hL[:,idx])
-#    
-#    fR *= 1/2
-#
-#    ### i - 1/2
-#    vL = um1hL[:,1]/um1hL[:,0]
-#    vR = um1hR[:,1]/um1hR[:,0]
-#    
-#    PL = P_from_Ev(um1hL[:,-1]/um1hL[:,0],um1hL[:,0],vL)
-#    PR = P_from_Ev(um1hR[:,-1]/um1hR[:,0],um1hR[:,0],vR)
-#    am1hL = np.sqrt(GAM*PL/um1hL[:,0])
-#    am1hR = np.sqrt(GAM*PR/um1hR[:,0])
-# 
-#    # We want the max eigenvalue of the Jacobian evaluated both at L and R     
-#    l1L = np.abs(vL-am1hL)
-#    l1R = np.abs(vR-am1hR)
-#    
-#    l2L = np.abs(vL)
-#    l2R = np.abs(vR)
-#
-#    l3L = np.abs(vL+am1hL)
-#    l3R = np.abs(vR+am1hR)
-#    
-#    eig = np.vstack((l1L,l1R,l2L,l2R,l3L,l3R))
-#    eig = np.transpose(eig)
-#    alpha = np.max(eig,axis=1)
-#    
-#    fL = compute_euler_flux(um1hL) + compute_euler_flux(um1hR)
-#    for idx in np.arange(0,3,1):
-#        fL[:,idx] -= alpha * (um1hR[:,idx]-um1hL[:,idx])    
-#    
-#    fL *= 1/2
-#    return -1/dz * (fR-fL)
+    fp1h += fp1hR
+    fm1h += fm1hR
+    
+    fR = fp1h
+    fL = fm1h
+    
+    return -1/dz * (fR-fL)
