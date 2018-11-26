@@ -134,6 +134,10 @@ def roe_average(u,U0):
     return up1h,um1h   
     
 def compute_lfc_flux(u,U0,dz,order):
+    # What's r that corresponds to our WENO order?
+    rweno = int((order-1)/2)
+    stencil_size = order
+    
     # u_{i+1}, u_{i-1}
     up1 = np.roll(u,-1,axis=0)
     um1 = np.roll(u,1,axis=0)  
@@ -171,22 +175,62 @@ def compute_lfc_flux(u,U0,dz,order):
     Rjm1h,Rjinvm1h = compute_eigenvector(um1h);
 
     # Transform into the characteristic domain
-    v = np.copy(u)
-    vlf = np.copy(u)
-    g = np.copy(u) 
+    nelem = u.shape[0] # Number of elements in domain
+    nunk = u.shape[1] # Number of unknowns
+    
+    v = np.zeros((nelem,stencil_size,nunk))
+    vlf = np.zeros((nelem,stencil_size,nunk))
+    g = np.zeros((nelem,stencil_size,nunk))
     
     flx = compute_euler_flux(u)
+    flx0 = compute_euler_flux(U0)
     
     ######
     # I + 1/2
-    ######
-    nelem = u.shape[0]
-    for idx in np.arange(0,nelem,1):
-        v[idx,:] = np.matmul(Rjinvp1h[idx],u[idx,:])
-        g[idx,:] = np.matmul(Rjinvp1h[idx],flx[idx,:])
-        vlf[idx,:] = np.matmul(Rjinvp1h[idx],u[idx,:])
-        vlf[idx,:] = np.matmul(np.diag(alpha),vlf[idx,:])
-
+    ######   
+    # For all elements, evaluate R_{i+1/2}^-1 * [STENCIL]   
+    # The conditional work for r = 1 and 2 (order 3 and 5). NOT HIGHER
+    for idx in range(nelem):
+        utmp = np.zeros((stencil_size,nunk))
+        ftmp = np.zeros((stencil_size,nunk))
+        
+        # Grab the correct stencil data
+        if idx >= rweno and idx < nelem-rweno:
+            utmp = u[idx-rweno:idx+rweno+1,:]
+            flxtmp = flx[idx-rweno:idx+rweno+1,:]
+        
+        # Beware of edges
+        elif idx == rweno-1 
+            if rweno-1>0: # Order 5
+                utmp[0,:] = U0[0,:]
+                ftmp[0,:] = flx0[0,:]
+                utmp[rweno-1:2*rweno+1,:] = u[idx-rweno+1:idx+rweno+1,:]
+                ftmp[rweno-1:2*rweno+1,:] = flx[idx-rweno+1:idx+rweno+1,:]  
+            elif rweno-1 == 0: # Order 3
+                utmp[0,:] = U0[0,:]
+                ftmp[0,:] = flx0[0,:]
+                utmp[rweno-1+1:idx+rweno+2,:] = u[idx-rweno+1:idx+rweno+2,:]
+                ftmp[rweno-1+1:idx+rweno+2,:] = flx[idx-rweno+1:idx+rweno+2,:] 
+                
+        elif idx == 0 and rweno > 1: # Order 5: we treated the case 0 above
+            utmp[0,:] = U0[0,:]
+            ftmp[0,:] = flx0[0,:]
+            utmp[1,:] = U0[0,:]
+            ftmp[1,:] = flx0[0,:]            
+            
+            utmp[rweno:2*rweno+1,:] = u[idx:idx+rweno,:]
+            ftmp[rweno:2*rweno+1,:] = flx[idx:idx+rweno,:]
+            
+        elif idx == nelem - rweno - 1 and nelem - rweno -1 not nelem - 1:
+            
+        elif idx == nelem - 1:
+          
+            
+        v[idx,:,:] = np.matmul(Rjinvp1h[idx],utmp.T).T
+        g[idx,:,:] = np.matmul(Rjinvp1h[idx],flxtmp.T).T
+        vlf[idx,:,:] = np.matmul(np.diag(alpha),v[idx,:,:].T).T
+            
+            
     ### Reconstruct WENO in the characteristics domain
     # f^+, f^- at i+1/2
     FLXp = np.zeros(u.shape)
