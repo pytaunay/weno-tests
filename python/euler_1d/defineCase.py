@@ -40,6 +40,6 @@ def defineCase(number):
         left = np.array([3.857,0.92,10.333])
         right = np.array([1,3.55,1])    
         cfl = 0.9
-        tmax = 0.09            
-        
+        tmax = 0.09        
+            
     return left,right,cfl,tmax

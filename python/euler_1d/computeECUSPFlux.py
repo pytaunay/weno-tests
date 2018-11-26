@@ -101,9 +101,19 @@ def compute_ecusp_flux(u,U0,dz,order):
     fLsub = (fm1hc + fm1hp)
     
     
-    # Supersonic traveling right
-    fRsupr = compute_euler_flux(up1hL)
-    fLsupr = compute_euler_flux(um1hL)
+    # Supersonic traveling right: reconstruct flux on boundary
+    flx = compute_euler_flux(u)
+    
+    # u_{i+1}, u_{i-1}
+    flxp1 = np.roll(flx,-1,axis=0)
+    flxm1 = np.roll(flx,1,axis=0)   
+    
+    fp1hL, fm1hR = compute_lr(flxp1,flx,flxm1,order) 
+    fm1hL = np.roll(fp1hL,1,axis=0)
+    fRsupr = fp1hL
+    fLsupr = fm1hL
+#    fRsupr = compute_euler_flux(up1hL)
+#    fLsupr = compute_euler_flux(um1hL)
     
     # Supersonic travelight left
     fRsupl = compute_euler_flux(up1hR)
