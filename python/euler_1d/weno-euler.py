@@ -42,7 +42,7 @@ GAM = 1.4
 # Scheme
 # Flux can be 'LF', 'LW', 'FORCE' ,'FLIC', ECUSP
 order = 5
-flux_type = 'LF'
+flux_type = 'LFC'
 
 # Data holders
 # [rho,rho*u,E]
@@ -51,7 +51,7 @@ U = np.zeros([len(zvec),3])
 # Case definition
 caseNum = 8
 left, right, cfl, tmax = defineCase(caseNum)
-cfl = 0.6
+tmax = 0.006
 f_0(U)
 U0 = np.copy(U)
 
@@ -81,6 +81,8 @@ if flux_type == 'ECUSP':
     compute_flux = lambda U,U0,dz,order: compute_ecusp_flux(U,U0,dz,order)
 elif flux_type == 'LF':
     compute_flux = lambda U,U0,dz,order: compute_lf_flux(U,U0,dz,order)
+elif flux_type == 'LFC':
+    compute_flux = lambda U,U0,dz,order: compute_lfc_flux(U,U0,dz,order)
 
 while tc<tmax:
     UN = np.copy(U)  
