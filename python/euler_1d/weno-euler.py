@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from utils import P_from_Ev, rhoE_from_Pv
 from computeECUSPFlux import compute_ecusp_flux
 from computeLFFlux import compute_lf_flux
+from computeLFCFlux import compute_lfc_flux
 from defineCase import defineCase
 
 # Initial conditions
@@ -48,9 +49,9 @@ flux_type = 'LF'
 U = np.zeros([len(zvec),3])
 
 # Case definition
-caseNum = 7
+caseNum = 8
 left, right, cfl, tmax = defineCase(caseNum)
-cfl = 0.25
+cfl = 0.6
 f_0(U)
 U0 = np.copy(U)
 
@@ -133,6 +134,8 @@ if flux_type == 'ECUSP':
     compute_flux = lambda U,U0,dz,order: compute_ecusp_flux(U,U0,dz,order)
 elif flux_type == 'LF':
     compute_flux = lambda U,U0,dz,order: compute_lf_flux(U,U0,dz,order)
+elif flux_type == 'LFC':
+    compute_flux = lambda U,U0,dz,order: compute_lfc_flux(U,U0,dz,order)
 
 while tc<tmax:
     UN = np.copy(U)  
