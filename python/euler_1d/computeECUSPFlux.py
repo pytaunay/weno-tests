@@ -140,11 +140,5 @@ def compute_ecusp_flux(u,U0,dz,order):
         fR[:,idx] = fRsub[:,idx] * b1 + fRsupr[:,idx] * b2 + fRsupl[:,idx] * b3
         fL[:,idx] = fLsub[:,idx] * b1 + fLsupr[:,idx] * b2 + fLsupl[:,idx] * b3
 
-#
-#    print(b1,b2,b3)
-#    print("------------")
-
-#    print(fR-fL)
-
     return -1/dz * (fR-fL)
 #    return -1/dz * (fRsub-fLsub)
