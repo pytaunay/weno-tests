@@ -87,7 +87,6 @@ def to_characteristics(u,flx,U0,flx0,order,Rjinvp1h,alpha):
                 ftmp[4] = flx0[-1]
                 ftmp[5] = flx0[-1]
         
-        # TODO: Adjust order 3
         elif order == 3:
             if idx == 0:
                 utmp[0] = U0[0]
@@ -232,8 +231,8 @@ def compute_lfc_flux(u,U0,dz,order):
     um1 = np.roll(u,1,axis=0)  
 
     ### Roe average at u^{i+-1/2}
-#    up1h, um1h = roe_average(u,U0)
-    up1h = (u+up1)*1/2
+    up1h, um1h = roe_average(u,U0)
+#    up1h = (u+up1)*1/2
     
 
     ### LF Flux splitting: f = f^+ + f^- where
