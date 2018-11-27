@@ -8,7 +8,7 @@ Date: November 2018
 import numpy as np
 import matplotlib.pyplot as plt
 
-from utils import P_from_Ev, rhoE_from_Pv
+from utils import P_from_Ev, rhoE_from_Pv,calculate_dt
 from computeLFCFlux import compute_lfc_flux
 from defineCase import defineCase
 from initialize import initialize
@@ -20,34 +20,23 @@ from initialize import initialize
 GAM = 1.4
 
 # Scheme
-# Flux can be 'LF', 'LW', 'FORCE' ,'FLIC', ECUSP
 order = 5
-flux_type = 'LFC'
 
 # Case definition
 case = 'double-mach'
 options = defineCase(case)
 
-U0,xvec,yvec,grid = initialize(options)
+U0,xvec,yvec,grid,dx,dy = initialize(options)
 xv, yv = np.meshgrid(xvec,yvec)
 
 ### Time
 tmax = options['tmax']
 cfl = options['cfl']
-
+dt = calculate_dt(U0,dx,dy,cfl)
+tc = 0
 
 # Resample the data on a mesh grid
 # dataZ = griddata(grid, U0[:,1], (xv, yv), method='nearest')
-
-
-## Time
-#P0 = P_from_Ev(U[:,2]/U[:,0],U[:,0],U[:,1]/U[:,0])
-#a0 = np.sqrt(GAM * P0 / U[:,0])
-#v0 = U[:,1]/U[:,0]
-#lam0 = np.max(v0+a0)
-#
-#dt = dz /lam0 * cfl
-#tc = 0
 
 # Plots
 f, axarr = plt.subplots(3, 2)
