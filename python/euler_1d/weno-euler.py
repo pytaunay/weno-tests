@@ -41,7 +41,7 @@ GAM = 1.4
 
 # Scheme
 # Flux can be 'LF', 'LW', 'FORCE' ,'FLIC', ECUSP
-order = 5
+order = 3
 flux_type = 'LFC'
 
 # Data holders
@@ -51,7 +51,7 @@ U = np.zeros([len(zvec),3])
 # Case definition
 caseNum = 1
 left, right, cfl, tmax = defineCase(caseNum)
-#tmax = 0.15
+#tmax = 0.02
 f_0(U)
 U0 = np.copy(U)
 
@@ -128,7 +128,7 @@ axarr[2,0].plot(zvec,U[:,1]/U[:,0]/asos,'o')
 ############### TRY WITH ECUSP
 U = np.copy(U0)
 tc = 0
-flux_type = 'ECUSP'
+flux_type = 'LF'
 dt = dz /lam0 * cfl
 idx = 0
 
@@ -172,11 +172,11 @@ while tc<tmax:
     
     tc = tc+dt
 
-#axarr[0,0].plot(zvec,U[:,0],'x')
-#axarr[0,1].plot(zvec,P,'x')
-#axarr[1,0].plot(zvec,P/U[:,0],'x')
-#axarr[1,1].plot(zvec,U[:,1]/U[:,0],'x')
-#axarr[2,0].plot(zvec,U[:,1]/U[:,0]/asos,'x')
+axarr[0,0].plot(zvec,U[:,0],'x')
+axarr[0,1].plot(zvec,P,'x')
+axarr[1,0].plot(zvec,P/U[:,0],'x')
+axarr[1,1].plot(zvec,U[:,1]/U[:,0],'x')
+axarr[2,0].plot(zvec,U[:,1]/U[:,0]/asos,'x')
 
 # Exact solution
 caseStr = 'exact/' + str(caseNum) + '/case.csv'
