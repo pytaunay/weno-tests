@@ -4,6 +4,7 @@ Description: defines a test case
 """
 
 import numpy as np
+from utils import rhoE_from_Pv
 
 """ Function: defineCase
 Returns an array that defines the case in the form:
@@ -18,6 +19,8 @@ def defineCase(case):
     xlim = np.zeros(2)     
     ylim = np.zeros(2)
     grid = np.zeros(2)
+    
+    options = {}
 
     # Double mach reflection 
     if case == 'double-mach':
@@ -27,12 +30,32 @@ def defineCase(case):
         tmax = 0.2
         cfl = 0.6
 
+        ### Initial conditions
+        # Post-shock
+        q1 = 8
+        u = 4.125*np.sqrt(3)
+        v = -4.125
+        P = 116.5
+        
+        q2 = q1*u
+        q3 = q1*v
+        q4 = rhoE_from_Pv(P,q1,u,v)
+        options['Upost'] = np.array([q1,q2,q3,q4]) # U AFTER shock        
+        
+        # Pre-shock
+        q1 = 1.4
+        u = 0
+        v = 0
+        P = 1
+        q2 = q1*u
+        q3 = q1*v
+        q4 = rhoE_from_Pv(P,q1,u,v)  
+        options['Upre'] = np.array([q1,q2,q3,q4]) # U BEFORE shock
+
         options['xshock'] = 1/6
         options['angleshock'] = 60*np.pi/180.
-        options['Upre'] = np.array([1.4,0,0,1]) # U BEFORE shock
-        options['Upost'] = np.array([8,4.125*np.sqrt(3),-4.125,116.5]) # U AFTER shock
-
-    # Flow over forward facing step
+        
+    # TODO: Flow over forward facing step
     elif case == 'facing-step':
         xlim = np.array([0.0,3.0])
         ylim = np.array([0.0,1.0])
