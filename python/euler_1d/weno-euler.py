@@ -49,7 +49,7 @@ flux_type = 'LFC'
 U = np.zeros([len(zvec),3])
 
 # Case definition
-caseNum = 8
+caseNum = 1
 left, right, cfl, tmax = defineCase(caseNum)
 #tmax = 0.15
 f_0(U)

@@ -92,12 +92,20 @@ def to_characteristics(u,flx,U0,flx0,order,Rjinvp1h,alpha):
             if idx == 0:
                 utmp[0] = U0[0]
                 ftmp[0] = flx0[0]
-                utmp[1:3] = u[0:2]
-                ftmp[1:3] = flx[0:2]
+                utmp[1:4] = u[0:3]
+                ftmp[1:4] = flx[0:3]
+            elif idx == nelem - 2:
+                utmp[0:3] = u[nelem-3:nelem]
+                ftmp[0:3] = flx[nelem-3:nelem]
+                utmp[3] = U0[-1]
+                ftmp[3] = flx0[-1]
+                
             elif idx == nelem - 1:
                 utmp[0:2] = u[nelem-2:nelem]
                 ftmp[0:2] = flx[nelem-2:nelem]
+                utmp[2] = U0[-1]
                 utmp[3] = U0[-1]
+                ftmp[2] = flx0[-1]
                 ftmp[3] = flx0[-1]
         
         # Perform the matrix multiplication
@@ -226,7 +234,6 @@ def compute_lfc_flux(u,U0,dz,order):
     ### Roe average at u^{i+-1/2}
 #    up1h, um1h = roe_average(u,U0)
     up1h = (u+up1)*1/2
-    um1h = (u+um1)*1/2
     
 
     ### LF Flux splitting: f = f^+ + f^- where
@@ -268,9 +275,15 @@ def compute_lfc_flux(u,U0,dz,order):
     FLXp = np.zeros((nelem,order,nunk))
     FLXm = np.zeros((nelem,order,nunk))
     
-    if order == 5:
-        FLXp = 1/2*(g[:,0:5,:] + vlf[:,0:5,:])
-        FLXm = 1/2*(g[:,1:6,:] - vlf[:,1:6,:])
+    FLXp = 1/2*(g[:,0:order,:] + vlf[:,0:order,:])
+    FLXm = 1/2*(g[:,1:order+1,:] - vlf[:,1:order+1,:])
+    
+#    if order == 5:
+#        FLXp = 1/2*(g[:,0:5,:] + vlf[:,0:5,:])
+#        FLXm = 1/2*(g[:,1:6,:] - vlf[:,1:6,:])
+#    elif order == 3:
+#        FLXp = 1/2*(g[:,0:3,:] + vlf[:,0:3,:])
+#        FLXm = 1/2*(g[:,1:6,:] - vlf[:,1:6,:])
 #    FLXm = 1/2*(g - vlf)
 
     ### Reconstruct WENO in the characteristics domain    
@@ -282,8 +295,8 @@ def compute_lfc_flux(u,U0,dz,order):
     FLXp1h = fp1hL + fp1hR
     FLXm1h = np.roll(FLXp1h,1,axis=0)
 
-    t1 = np.copy(FLXp1h)
-    t2 = np.copy(FLXm1h)
+#    t1 = np.copy(FLXp1h)
+#    t2 = np.copy(FLXm1h)
 
     ### Go back into the normal domain
     for idx in range(nelem):
