@@ -9,9 +9,9 @@ import numpy as np
 
 def initialize(options):
     if options['case'] == 'double-mach':
-        U,xvec,yvec,grid = initialize_dm(options)
+        U,xvec,yvec,grid,dx,dy = initialize_dm(options)
    
-    return U,xvec,yvec,grid     
+    return U,xvec,yvec,grid,dx,dy   
         
 def initialize_dm(options):
     Nx = options['grid'][0]
@@ -49,4 +49,4 @@ def initialize_dm(options):
              
             grid[ii+Nx*jj] = np.array([xc,yc])    
                 
-    return U,xvec,yvec,grid
+    return U,xvec,yvec,grid,dx,dy
