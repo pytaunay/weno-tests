@@ -68,10 +68,9 @@ def roe_average(u,U0):
     return up1h,um1h   
     
 ### Calculate the flux in one-direction
-def compute_lfc_flux_1D(U,U0,dx,dy,Nx,Ny,order,direction):
+def compute_lfc_flux_1D(U,U0,dx,dy,Nx,Ny,order,direction,options,tc,lambda_calc_char):
     nelem = U.shape[0]
     nunk = U.shape[1]
-    
     
     ### Compute the average at the border      
     Up1h = compute_average(U,U0,dx,dy,Nx,Ny,direction)
@@ -103,7 +102,7 @@ def compute_lfc_flux_1D(U,U0,dx,dy,Nx,Ny,order,direction):
 
     ### Characteristics
     # Eigenvectors: Compute the block matrix at each right eigenvector
-    Rh,Lh = compute_eigenvector(Up1h,direction);
+    Rh,Lh,Rlhs0,Llhs0 = compute_eigenvector(Up1h,U0,direction);
     
     ### Compute the flux
     flx = compute_euler_flux(U,direction)
@@ -111,8 +110,9 @@ def compute_lfc_flux_1D(U,U0,dx,dy,Nx,Ny,order,direction):
 
     ### Transform into the characteristic domain
     # V = R^-1 U, H = R^-1 * F or R^-1 * G, VLF = alpha * V
-    V,H,VLF = to_characteristics(U,flx,U0,flx0,order,Lh,alpha,Nx,Ny,direction)
-            
+#    V,H,VLF = to_characteristics(U,flx,U0,flx0,order,Lh,alpha,Nx,Ny,direction)
+    V,H,VLF = to_characteristics(U,flx,U0,flx0,order,Lh,alpha,Nx,Ny,direction,options,tc,lambda_calc_char)      
+    
     ### Compute f+, f- at i+1/2 for all elements on the stencil
     FLXp = np.zeros((nelem,order,nunk))
     FLXm = np.zeros((nelem,order,nunk))
@@ -126,18 +126,19 @@ def compute_lfc_flux_1D(U,U0,dx,dy,Nx,Ny,order,direction):
     # Compute the flux
     FLXp1h = fp1hL + fp1hR
     
+    # TODO: EDIT THE MOVES
     if direction == 'dx':
         FLXm1h = np.roll(FLXp1h,1,axis=0)
     elif direction == 'dy':
-        FLXm1h = np.roll(FLXp1h,-Nx,axis=0)
+        FLXm1h = np.roll(FLXp1h,Nx,axis=0)
     
     ### Go back into the normal domain
     for idx in range(nelem):
         FLXp1h[idx] = np.matmul(Rh[idx],FLXp1h[idx])
-        if idx > 0:
+        if idx and idx % Nx != 0:
             FLXm1h[idx] = np.matmul(Rh[idx-1],FLXm1h[idx])
         else:
-            FLXm1h[idx] = np.matmul(Rh[0],FLXm1h[idx])    
+            FLXm1h[idx] = np.matmul(Rlhs0,FLXm1h[idx])    
     
     if direction =='dx':
         dz = dx
@@ -153,7 +154,7 @@ def compute_average(U,U0,dx,dy,Nx,Ny,direction):
         # Roll the x-direction
         Up1 = np.roll(U,-1,axis=0)
         
-        # But be careful about the right-hand edge
+        # But be careful about the left-hand edge
         for jj in range(Ny):
             Up1[Nx-1 + jj*Nx] = U[Nx-1 + jj*Nx] 
         
@@ -170,10 +171,10 @@ def compute_average(U,U0,dx,dy,Nx,Ny,direction):
     return Up1h
     
 
-def compute_lfc_flux(U,U0,dx,dy,Nx,Ny,order):    
+def compute_lfc_flux(U,U0,dx,dy,Nx,Ny,order,options,tc,lambda_calc_char):    
     ### Flux in the x and y direction
-    FLXX = compute_lfc_flux_1D(U,U0,dx,dy,Nx,Ny,order,'dx')
+    FLXX = compute_lfc_flux_1D(U,U0,dx,dy,Nx,Ny,order,'dx',options,tc,lambda_calc_char)
     
-    FLXY = compute_lfc_flux_1D(U,U0,dx,dy,Nx,Ny,order,'dy')
+    FLXY = compute_lfc_flux_1D(U,U0,dx,dy,Nx,Ny,order,'dy',options,tc,lambda_calc_char)
 
     return FLXX+FLXY
