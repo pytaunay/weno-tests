@@ -14,27 +14,26 @@ def initialize(options):
     return U,xvec,yvec,grid,dx,dy   
         
 def initialize_dm(options):
-    Nx = options['grid'][0]
-    Ny = options['grid'][1]
-    
+    ### Grid
+    # x direction
+    Nx = options['grid'][0]    
     Nxtot = Nx + 2
-    Nytot = Ny + 2
+    Lx = options['xlim'][1]-options['xlim'][0]
+    dx = Lx/(Nxtot-1)
+    xvec = np.linspace(0,Lx,Nxtot)
+    
+    # y direction
+    # override the Ny parameter to have dx = dy
+    Ly = options['ylim'][1]-options['ylim'][0]
+    dy = dx    
+    yvec = np.arange(0,Ly+dx,dx)
+    Nytot = len(yvec)
     
     # Total number of points WITH the boundaries included
     # The boundaries are at x = 0, y = 0, x = L, y = L
     nelem = Nxtot * Nytot
     nunk = options['Upost'].shape[0] # Number of unknowns
-    
-    Lx = options['xlim'][1]-options['xlim'][0]
-    Ly = options['ylim'][1]-options['ylim'][0]
-    
-    dx = Lx/(Nxtot-1)
-    dy = Ly/(Nytot-1)
-    
-    #xvec = np.linspace(dx/2,Lx-dx/2,Nx)
-    #yvec = np.linspace(dy/2,Ly-dy/2,Ny)
-    xvec = np.linspace(0,Lx,Nxtot)
-    yvec = np.linspace(0,Ly,Nytot)
+
 
     U = np.zeros((nelem,nunk))
     grid = np.zeros((nelem,2))
