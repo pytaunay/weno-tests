@@ -1,4 +1,6 @@
-%project 3--upwind-Zha-Bilgen flux splitting
+% ORIGINAL SOURCE: https://www3.nd.edu/~gtryggva/
+% https://www3.nd.edu/~gtryggva/CFD-Course2017/Project-3-2017.pdf
+% https://www3.nd.edu/~gtryggva/CFD-Course2017/Euler2D-ZB-upw-Oblique.m
 
 nx=256; ny=64; xl=4.0;yl=1; tfinal=0.2; time=0; gg=1.4;
 p_left=116.5;p_right=1;
