@@ -33,14 +33,14 @@ options = defineCase(case)
 U0,xvec,yvec,grid,dx,dy = initialize(options)
 xv, yv = np.meshgrid(xvec,yvec)
 Nx = len(xvec)
-Ny = len(yvec)
+Ny = len(yvec) 
 
 ### Time
 tmax = options['tmax']
 cfl = options['cfl']
 dt = calculate_dt(U0,dx,dy,cfl)
 tc = 0
-tmax = dt
+tmax = 0
 
 # Resample the data on a mesh grid
 # dataZ = griddata(grid, U0[:,1], (xv, yv), method='nearest')
