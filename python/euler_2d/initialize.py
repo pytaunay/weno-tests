@@ -43,16 +43,11 @@ def initialize_dm(options):
         for ii in range(Nxtot):
             xc = xvec[ii]
             
-            slope = np.tan(options['angleshock'])
-            ylim = slope*(xc - options['xshock'])
-            
-            if xc <= options['xshock']:
-                U[ii+Nxtot*jj] = options['Upost']
-            elif xc > options['xshock'] and yc >= ylim:
+            if xc < options['xshock'] + yc/np.sqrt(3):
                 U[ii+Nxtot*jj] = options['Upost']
             else:
                 U[ii+Nxtot*jj] = options['Upre']
-             
+            
             grid[ii+Nxtot*jj] = np.array([xc,yc])    
                 
     return U,xvec,yvec,grid,dx,dy
