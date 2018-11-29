@@ -102,7 +102,10 @@ def compute_lfc_flux_1D(U,U0,dx,dy,Nx,Ny,order,direction,options,tc,lambda_calc_
 
     ### Characteristics
     # Eigenvectors: Compute the block matrix at each right eigenvector
-    Rh,Lh,Rlhs0,Llhs0 = compute_eigenvector(Up1h,U0,direction);
+    if direction == 'dx':
+        Rh,Lh,Rlhs0,Llhs0,_,_ = compute_eigenvector(Up1h,U0,direction)
+    elif direction == 'dy':
+        Rh,Lh,Rlhs0,Llhs0,Rlhs0pre,Llhs0pre = compute_eigenvector(Up1h,U0,direction)
     
     ### Compute the flux
     flx = compute_euler_flux(U,direction)
@@ -126,19 +129,36 @@ def compute_lfc_flux_1D(U,U0,dx,dy,Nx,Ny,order,direction,options,tc,lambda_calc_
     # Compute the flux
     FLXp1h = fp1hL + fp1hR
     
-    # TODO: EDIT THE MOVES
     if direction == 'dx':
         FLXm1h = np.roll(FLXp1h,1,axis=0)
     elif direction == 'dy':
+        No = (int)(np.ceil(options['xshock']/dx)) # Location of shock on bottom boundary
+        tmp = FLXp1h[No:Nx-1]
         FLXm1h = np.roll(FLXp1h,Nx,axis=0)
+        FLXm1h[No:Nx-1] = tmp
     
-    ### Go back into the normal domain
-    for idx in range(nelem):
-        FLXp1h[idx] = np.matmul(Rh[idx],FLXp1h[idx])
-        if idx and idx % Nx != 0:
-            FLXm1h[idx] = np.matmul(Rh[idx-1],FLXm1h[idx])
-        else:
-            FLXm1h[idx] = np.matmul(Rlhs0,FLXm1h[idx])    
+    ### Go back into the normal domain    
+    if direction == 'dx':
+        for idx in range(nelem):
+            FLXp1h[idx] = np.matmul(Rh[idx],FLXp1h[idx])
+            if idx % Nx != 0:
+                FLXm1h[idx] = np.matmul(Rh[idx-1],FLXm1h[idx])
+            else:
+                FLXm1h[idx] = np.matmul(Rlhs0,FLXm1h[idx])    
+    elif direction == 'dy':
+        for idx in range(nelem):
+            if idx == 522:
+                print("522")
+            
+            FLXp1h[idx] = np.matmul(Rh[idx],FLXp1h[idx])
+            if idx > Nx-1: # Any cell with an index higher than Nx is NOT on the bottom boundary
+                FLXm1h[idx] = np.matmul(Rh[idx-Nx],FLXm1h[idx])
+            else:
+                No = (int)(np.ceil(options['xshock']/dx)) # Location of shock on bottom boundary
+                if idx < No: # If we are before the shock, use "post" conditions
+                    FLXm1h[idx] = np.matmul(Rlhs0,FLXm1h[idx]) 
+                else: # Otherwise, use "pre" conditions
+                    FLXm1h[idx] = np.matmul(Rlhs0pre,FLXm1h[idx]) 
     
     if direction =='dx':
         dz = dx
