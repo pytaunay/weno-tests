@@ -5,6 +5,8 @@ Calculates the stencil characteristics decomposition for all elements
 
 import numpy as np
 
+from eulerCharacteristics import compute_euler_flux
+
 def dmStencilCharacteristics(U,flx,U0,flx0,order,Lh,alpha,Nx,Ny,direction,options,tc):
     nelem = U.shape[0]
     nunk = U.shape[1]    
@@ -95,8 +97,8 @@ def dmStencilCharacteristics(U,flx,U0,flx0,order,Lh,alpha,Nx,Ny,direction,option
             # Current shock location
             xs = options['xshock'] + (1+20*tc)/np.sqrt(3)
 
-#            if idx == 522:
-#                print("532")
+            if idx == 524-Nx:
+                print("532")
             
             if order == 5:
                 if yidx == 0: # Bottom boundary, 2 ghost cells
@@ -106,10 +108,16 @@ def dmStencilCharacteristics(U,flx,U0,flx0,order,Lh,alpha,Nx,Ny,direction,option
                         Ftmp[0] = flx0[0]
                         Ftmp[1] = flx0[0]
                     else:
-                        Utmp[0] = U[idx]
-                        Utmp[1] = U[idx]
-                        Ftmp[0] = flx[idx]
-                        Ftmp[1] = flx[idx]
+                        tmp = U[idx]
+                        tmp[2] = 0 # Zero y-velocity
+                        flxtmp = compute_euler_flux(np.array([tmp]),direction)
+                        flxtmp = flxtmp[0]
+                        
+                        Utmp[0] = tmp
+                        Utmp[1] = tmp
+                        
+                        Ftmp[0] = flxtmp
+                        Ftmp[1] = flxtmp
                     
                     Utmp[2:6] = U[idx::Nx][0:4]
                     Ftmp[2:6] = flx[idx::Nx][0:4]
@@ -119,11 +127,16 @@ def dmStencilCharacteristics(U,flx,U0,flx0,order,Lh,alpha,Nx,Ny,direction,option
                         Utmp[0] = U0[0]
                         Ftmp[0] = flx0[0]
                     else:
-                        Utmp[0] = U[idx-yidx*Nx]
-                        Ftmp[0] = flx[idx-yidx*Nx]
+                        tmp = U[idx-Nx]
+                        tmp[2] = 0 # Zero y-velocity
+                        flxtmp = compute_euler_flux(np.array([tmp]),direction)
+                        flxtmp = flxtmp[0]
+                        
+                        Utmp[0] = tmp
+                        Ftmp[0] = flxtmp
 
-                    Utmp[1:6] = U[idx::Nx][0:5]
-                    Ftmp[1:6] = flx[idx::Nx][0:5]
+                    Utmp[1:6] = U[idx-Nx::Nx][0:5]
+                    Ftmp[1:6] = flx[idx-Nx::Nx][0:5]
                     
                 elif yidx == Ny-3: # Top boundary, 1 ghost cell
                     if xc < xs:
