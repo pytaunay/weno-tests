@@ -17,8 +17,6 @@ def dmStencilCharacteristics(U,flx,U0,flx0,order,Lh,alpha,Nx,Ny,direction,option
     
     if direction == 'dx':
         for idx in range(nelem):
-            if idx == 532:
-                print("532")
             Utmp = np.zeros((order+1,nunk))
             Ftmp = np.zeros((order+1,nunk))
                 
@@ -96,6 +94,9 @@ def dmStencilCharacteristics(U,flx,U0,flx0,order,Lh,alpha,Nx,Ny,direction,option
             
             # Current shock location
             xs = options['xshock'] + (1+20*tc)/np.sqrt(3)
+
+            if idx == 522:
+                print("532")
             
             if order == 5:
                 if yidx == 0: # Bottom boundary, 2 ghost cells
