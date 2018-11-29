@@ -121,7 +121,7 @@ def eigenvector_y(u,v,a,q,h,nunk):
     Lj[2,:] /= (2*a**2)
     
     Lj[3,0] = -u
-    Lj[3,2] = 1
+    Lj[3,1] = 1
 
     return Rj, Lj    
 
@@ -166,9 +166,14 @@ def compute_eigenvector(U,U0,direction):
             Rj, Lj = eigenvector_x(u[idx],v[idx],a[idx],q[idx],h[idx],nunk)
             Rjlist.append(Rj)
             Ljlist.append(Lj)
+        Rlhs0pre = None
+        Llhs0pre = None
+        
     
     elif direction == 'dy':
+        # For the y-direction, the bottom boundary can either be pre or post-shock
         Rlhs0, Llhs0 = eigenvector_y(u0[0],v0[0],a0[0],q0[0],h0[0],nunk)
+        Rlhs0pre, Llhs0pre = eigenvector_y(u0[-1],v0[-1],a0[-1],q0[-1],h0[-1],nunk)
         for idx in range(nelem):
             Rj, Lj = eigenvector_y(u[idx],v[idx],a[idx],q[idx],h[idx],nunk)
             Rjlist.append(Rj)
@@ -177,7 +182,7 @@ def compute_eigenvector(U,U0,direction):
     Rj = Rjlist
     Lj = Ljlist
 
-    return Rj,Lj,Rlhs0,Llhs0
+    return Rj,Lj,Rlhs0,Llhs0,Rlhs0pre,Llhs0pre
  
 
 def to_characteristics(U,flx,U0,flx0,order,Lh,alpha,Nx,Ny,direction,options,tc,lambda_calc_char):
