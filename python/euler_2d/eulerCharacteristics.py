@@ -142,10 +142,10 @@ def compute_eigenvector(U,U0,direction):
     h = a**2/(GAM-1) + q # Enthalpy
 
 
-    rho0 = U[:,0]
-    u0 = U[:,1] / rho0
-    v0 = U[:,2] / rho0
-    E0 = U[:,3] / rho0
+    rho0 = U0[:,0]
+    u0 = U0[:,1] / rho0
+    v0 = U0[:,2] / rho0
+    E0 = U0[:,3] / rho0
     
     P0 = P_from_Ev(E0,rho0,u0,v0)
     

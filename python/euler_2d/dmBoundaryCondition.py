@@ -14,7 +14,7 @@ def dmBoundaryCondition(U,U0,options,tc):
     
     for idx in range(nelem):
         yidx = (int)(idx/Nx) # Increases by 1 for every row
-        xc = dx/2 + (idx%Nx) * dx
+        xc = dx + (idx%Nx) * dx
         
         if idx % Nx == 0: # Left boundary
             U[idx] = options['Upost']
