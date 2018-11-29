@@ -167,8 +167,7 @@ def compute_average(U,U0,dx,dy,Nx,Ny,direction):
         # The right-hand edge now has the LHS values... 
         # This fixes it by setting the i+1 value to the i value for the cells
         # on the right boundary
-        for jj in range(Ny):
-            Up1[Nx-1 + jj*Nx] = U[Nx-1 + jj*Nx] 
+        Up1[Nx-1::Nx] = U[Nx-1::Nx]
         
     elif direction == 'dy':
         # Roll the y-direction
