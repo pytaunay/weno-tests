@@ -87,9 +87,9 @@ def dmStencilCharacteristics(U,flx,U0,flx0,order,Lh,alpha,Nx,Ny,direction,option
             Ftmp = np.zeros((order+1,nunk))
             
             yidx = (int)(idx/Nx) # Increases by 1 for every row
-            dx = options['xlim'][1] / options['grid'][0] 
+            dx = options['xlim'][1] / (Nx-1)
 #            dy = options['ylim'][1] / options['grid'][1]
-            xc = dx + (idx%Nx) * dx # Location of cell along x axis
+            xc = (idx%Nx) * dx # Location of cell along x axis
 #            yc = dy/2 + yidx*dy
             
             # Current shock location
