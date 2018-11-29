@@ -132,10 +132,7 @@ def compute_lfc_flux_1D(U,U0,dx,dy,Nx,Ny,order,direction,options,tc,lambda_calc_
     if direction == 'dx':
         FLXm1h = np.roll(FLXp1h,1,axis=0)
     elif direction == 'dy':
-        No = (int)(np.ceil(options['xshock']/dx)) # Location of shock on bottom boundary
-        tmp = FLXp1h[No:Nx-1]
         FLXm1h = np.roll(FLXp1h,Nx,axis=0)
-        FLXm1h[No:Nx-1] = tmp
     
     ### Go back into the normal domain    
     if direction == 'dx':
@@ -146,19 +143,12 @@ def compute_lfc_flux_1D(U,U0,dx,dy,Nx,Ny,order,direction,options,tc,lambda_calc_
             else:
                 FLXm1h[idx] = np.matmul(Rlhs0,FLXm1h[idx])    
     elif direction == 'dy':
-        for idx in range(nelem):
-            if idx == 522:
-                print("522")
-            
+        for idx in range(nelem):            
             FLXp1h[idx] = np.matmul(Rh[idx],FLXp1h[idx])
             if idx > Nx-1: # Any cell with an index higher than Nx is NOT on the bottom boundary
                 FLXm1h[idx] = np.matmul(Rh[idx-Nx],FLXm1h[idx])
             else:
-                No = (int)(np.ceil(options['xshock']/dx)) # Location of shock on bottom boundary
-                if idx < No: # If we are before the shock, use "post" conditions
-                    FLXm1h[idx] = np.matmul(Rlhs0,FLXm1h[idx]) 
-                else: # Otherwise, use "pre" conditions
-                    FLXm1h[idx] = np.matmul(Rlhs0pre,FLXm1h[idx]) 
+                FLXm1h[idx] = np.matmul(Rlhs0,FLXm1h[idx]) # We don't care about what's at the bottom boundary: it will be overwritten
     
     if direction =='dx':
         dz = dx
@@ -173,8 +163,10 @@ def compute_average(U,U0,dx,dy,Nx,Ny,direction):
     if direction == 'dx':
         # Roll the x-direction
         Up1 = np.roll(U,-1,axis=0)
-        
-        # But be careful about the left-hand edge
+
+        # The right-hand edge now has the LHS values... 
+        # This fixes it by setting the i+1 value to the i value for the cells
+        # on the right boundary
         for jj in range(Ny):
             Up1[Nx-1 + jj*Nx] = U[Nx-1 + jj*Nx] 
         
