@@ -18,10 +18,10 @@ def dmBoundaryCondition(U,U0,options,tc):
         
         if idx % Nx == 0: # Left boundary
             U[idx] = options['Upost']
-        elif yidx == 0:
+        elif yidx == 0: # Bottom boundary
             if xc < options['xshock']:
                 U[idx] = options['Upost']
-        elif yidx == Ny-1:
+        elif yidx == Ny-1: # Top boundary
             if xc < xs:
                 U[idx] = options['Upost']
             else:
