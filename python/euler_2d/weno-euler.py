@@ -40,7 +40,7 @@ tmax = options['tmax']
 cfl = options['cfl']
 dt = calculate_dt(U0,dx,dy,cfl)
 tc = 0
-tmax = 5*dt
+tmax = dt
 
 # Resample the data on a mesh grid
 # dataZ = griddata(grid, U0[:,1], (xv, yv), method='nearest')
@@ -92,7 +92,9 @@ while tc<tmax:
     asos = np.sqrt(GAM * P / rho)
     lam = np.max(np.abs(v)+asos)
         
-    dt = calculate_dt(U,dx,dy,cfl)
+    
+    
+#    dt = calculate_dt(U,dx,dy,cfl)
 #    print(tc,dt)
     if(tc + dt > tmax):
         dt = tmax - tc
@@ -109,12 +111,12 @@ TZ = PZ/rhoZ
 aZ = np.sqrt(GAM*PZ/rhoZ)
 MZ = np.sqrt(uZ**2+vZ**2)/aZ
 
-axarr[0,0].contourf(xv,yv,uZ)
-axarr[0,1].contourf(xv,yv,PZ)
-axarr[1,0].contourf(xv,yv,TZ)
-axarr[1,1].contourf(xv,yv,uZ)
-axarr[2,0].contourf(xv,yv,MZ)
-axarr[2,1].contourf(xv,yv,EZ)
+axarr[0,0].contour(xv,yv,uZ)
+axarr[0,1].contour(xv,yv,PZ)
+axarr[1,0].contour(xv,yv,TZ)
+axarr[1,1].contour(xv,yv,uZ)
+axarr[2,0].contour(xv,yv,MZ)
+axarr[2,1].contour(xv,yv,EZ)
 
 
 
