@@ -46,10 +46,10 @@ def calculate_dt(U,dx,dy,cfl):
     ly_max = np.max(eig)
         
     ### CFL condition
-#    tx = 1/dx*lx_max
-#    ty = 1/dy*ly_max
+    tx = 1/dx*lx_max
+    ty = 1/dy*ly_max
 #    
-#    dt = cfl/(tx+ty)
-    dt = 0.145*dx/np.max(a)
+    dt = cfl/(tx+ty)
+#    dt = 0.145*dx/np.max(a)
 
     return dt
