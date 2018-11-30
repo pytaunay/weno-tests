@@ -104,10 +104,10 @@ while tc<tmax:
     lambda_bc(U1,tc)
 #    
     U2 = 3/4*UN + 1/4*U1 + 1/4* dt * compute_flux(U1,tc)
-    lambda_bc(U2,tc)
+    lambda_bc(U2,tc+1/4*dt)
     
     UNP1 = 1/3*UN + 2/3*U2 + 2/3 * dt * compute_flux(U2,tc)
-    lambda_bc(UNP1,tc)
+    lambda_bc(UNP1,tc+2/3*dt)
             
 #    lambda_bc(UNP1,tc)
     U = np.copy(UNP1)
