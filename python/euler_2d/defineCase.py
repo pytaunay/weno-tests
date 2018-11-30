@@ -28,7 +28,7 @@ def defineCase(case):
         ylim = np.array([0.0,1.0])
         grid = np.array([254,62])
         tmax = 0.2
-        cfl = 0.6
+        cfl = 0.9
 
         ### Initial conditions
         # Post-shock
