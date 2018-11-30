@@ -2,3 +2,4 @@ Burgers
 *.m~
 *.pyc
 __pycache__
+*.pkl
