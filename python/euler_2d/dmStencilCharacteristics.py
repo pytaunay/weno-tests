@@ -95,10 +95,9 @@ def dmStencilCharacteristics(U,flx,U0,flx0,order,Lh,alpha,Nx,Ny,direction,option
 #            yc = dy/2 + yidx*dy
             
             # Current shock location
-            xs = options['xshock'] + (1+20*tc)/np.sqrt(3)
-
-            if idx == 524-Nx:
-                print("532")
+            xs0 = options['xshock'] + options['ylim'][1] / np.sqrt(3) # Shock location at t = 0
+            vs = 20 / np.sqrt(3) 
+            xs = xs0 + vs * tc
             
             if order == 5:
                 if yidx == 0: # Bottom boundary, 2 ghost cells

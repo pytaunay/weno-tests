@@ -9,7 +9,9 @@ def dmBoundaryCondition(U,U0,options,tc):
     Ny = options['grid'][1] + 2
     
     dx = options['xlim'][1] / Nx
-    xs = options['xshock'] + (1+20*tc)/np.sqrt(3) # Shock location
+    xs0 = options['xshock'] + options['ylim'][1] / np.sqrt(3) # Shock location at t=0
+    vs = 20 / np.sqrt(3) 
+    xs = xs0 + vs * tc
     
     U[::Nx] = options['Upost'] # Left boundary
     U[Nx-1::Nx] = options['Upre'] # Right boundary
