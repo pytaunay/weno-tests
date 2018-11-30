@@ -78,6 +78,7 @@ p3 = axarr[1,1].contour(xv,yv,uZ)
 p4 = axarr[2,0].contour(xv,yv,MZ)
 p5 = axarr[2,1].contour(xv,yv,EZ)
 
+plt.ion()
 
 #######################
 #### TIME MARCHING ####
@@ -93,6 +94,7 @@ UNP1 = np.zeros(U0.shape)
 
 nelem = U.shape[0]
 while tc<tmax:
+    
     print(tc,dt)
     UN = np.copy(U)  
 
@@ -118,6 +120,8 @@ while tc<tmax:
     asos = np.sqrt(GAM * P / rho)
     lam = np.max(np.abs(v)+asos)
         
+    ### Plotting
+    # Get the new data on a grid
     rhoZ = griddata(grid, rho, (xv, yv), method='nearest')
     uZ = griddata(grid, u, (xv, yv), method='nearest')
     vZ = griddata(grid, v, (xv, yv), method='nearest')
@@ -127,6 +131,13 @@ while tc<tmax:
     aZ = np.sqrt(GAM*PZ/rhoZ)
     MZ = np.sqrt(uZ**2+vZ**2)/aZ
     
+    # Plot all contours
+    f.canvas.close()
+    for axline in axarr:
+        for ax in axline:
+            for coll in ax.collections:
+                ax.collections.remove(coll)
+    
     axarr[0,0].contour(xv,yv,uZ)
     axarr[0,1].contour(xv,yv,PZ)
     axarr[1,0].contour(xv,yv,TZ)
@@ -134,9 +145,11 @@ while tc<tmax:
     axarr[2,0].contour(xv,yv,MZ)
     axarr[2,1].contour(xv,yv,EZ)
     
+    f.canvas.update()
     f.canvas.draw()
-    f.canvas.flush_events()
-
+    f.canvas.show()
+    f.show()
+    plt.pause(0.1)
     
 #    dt = calculate_dt(U,dx,dy,cfl)
 #    print(tc,dt)
