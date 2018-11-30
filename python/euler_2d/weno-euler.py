@@ -40,7 +40,8 @@ tmax = options['tmax']
 cfl = options['cfl']
 dt = calculate_dt(U0,dx,dy,cfl)
 tc = 0
-tmax = 0.05
+#tmax = 0.05
+#tmax = 0
 
 # Resample the data on a mesh grid
 # dataZ = griddata(grid, U0[:,1], (xv, yv), method='nearest')
@@ -98,17 +99,17 @@ while tc<tmax:
     print(tc,dt)
     UN = np.copy(U)  
 
-    UNP1 = UN + dt * compute_flux(UN,tc)  
-#    U1 = UN + dt * compute_flux(UN,tc)  
-#    lambda_bc(U1,tc)
-##    
-#    U2 = 3/4*UN + 1/4*U1 + 1/4* dt * compute_flux(U1,tc)
-#    lambda_bc(U2,tc)
+#    UNP1 = UN + dt * compute_flux(UN,tc)  
+    U1 = UN + dt * compute_flux(UN,tc)  
+    lambda_bc(U1,tc)
 #    
-#    UNP1 = 1/3*UN + 2/3*U2 + 2/3 * dt * compute_flux(U2,tc)
-#    lambda_bc(UNP1,tc)
-            
+    U2 = 3/4*UN + 1/4*U1 + 1/4* dt * compute_flux(U1,tc)
+    lambda_bc(U2,tc)
+    
+    UNP1 = 1/3*UN + 2/3*U2 + 2/3 * dt * compute_flux(U2,tc)
     lambda_bc(UNP1,tc)
+            
+#    lambda_bc(UNP1,tc)
     U = np.copy(UNP1)
 
     # Make sure we don't exceed the CFL condition by changing the time step
@@ -135,10 +136,11 @@ while tc<tmax:
     f.canvas.close()
     for axline in axarr:
         for ax in axline:
-            for coll in ax.collections:
-                ax.collections.remove(coll)
+            while(len(ax.collections) > 0):
+                for coll in ax.collections:
+                    ax.collections.remove(coll)
     
-    axarr[0,0].contour(xv,yv,uZ)
+    axarr[0,0].contour(xv,yv,rhoZ)
     axarr[0,1].contour(xv,yv,PZ)
     axarr[1,0].contour(xv,yv,TZ)
     axarr[1,1].contour(xv,yv,uZ)
@@ -151,7 +153,7 @@ while tc<tmax:
     f.show()
     plt.pause(0.1)
     
-#    dt = calculate_dt(U,dx,dy,cfl)
+    dt = calculate_dt(U,dx,dy,cfl)
 #    print(tc,dt)
     if(tc + dt > tmax):
         dt = tmax - tc
